@@ -1,8 +1,12 @@
 #include <iostream>
+#include <map>
 #include <string>
 #include "main.h"
 #include "constantes.h"
 using namespace std;
+
+
+
 
 /*
 * @arg : choice est un char qui vaut soit 'H', soit 'A', soit 'F'
@@ -31,13 +35,14 @@ void GameEngine::updateTurnOfPlayer(){
 
 void GameEngine::move(int nc, int nr){
   //Recupérer la ligne (array)
-  array<int,SIZE_ROW> row = board[nr];
 
-  if(*cell != 'x'){
+
+  if(/*row[nc] != 'x'*/0 ){
     // Move is invalid
   } else {
-      row[nc] = turnOfPlayer;
+      board.move(turnOfPlayer,nc,nr);
       updateTurnOfPlayer();
+
   }
 }
 
@@ -54,17 +59,33 @@ void GameEngine::launch(){
   do{
     /*demander le move du joueur*/
     string m = askMove();
-
-    if(m.size() > 2){
-      /*interpréter m en nr et nc*/
-      int nc = TABL2N.find((char)m[0]);
-      int nr =  m[1] - '0';
+    int c[2] ;
+    if(m.size() < 3){
       /*executer le move*/
+      board.convert_coord(c,m);
+
+      int nc = c[0];
+      int nr = c[1];
+
       move(nc, nr);
       board.display();
     }
     else {
       /*si 'exit', arrêtez le jeu*/
     }
-  }while(/*soit le board est rempli, soit plus de pions W, soit plus de pions B | si exit, break*/)
+  }while(1);
+}
+
+void GameEngine::wut2flip(vector<int[2]> 2flip, char color, int nc, int nr) const{
+
+  // on veut inscrire les coordonnees des pions a flipper
+  // on
+  array<array<char,SIZE_COL>,SIZE_ROW> cBoard = board.boardCopy();
+
+  
+  for(int i = 0; i<=)
+    if(board[nc][nr])
+  while ()
+
+
 }

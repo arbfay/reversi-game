@@ -1,15 +1,23 @@
 #include <iostream>
 #include <array>
 #include <string>
+#include <map>
 #include "constantes.h"
 using namespace std;
 
 
 class Board{
   array<array<char,SIZE_COL>,SIZE_ROW> board; //Array d'Arrays
+  map<char,int> tabL2N;
+
+
   public:
     void display(ostream & out = cout) const;
     Board();
+    array<array<char,SIZE_COL>,SIZE_ROW> boardCopy() const;
+    void convert_Coord(int coord[],string m) ;// prend int et un char et on renvoi un tqbaleau de int
+    void move(char color, int nc,int nr);
+
 };
 
 
@@ -36,6 +44,9 @@ class GameEngine{
     void move(int nc, int nr);
     string askMove();
     void launch();
+    void wut2flip(vector<int[2]> 2flip, char color,int nc,int nr) const;
+
+
 };
 
 class Menu{

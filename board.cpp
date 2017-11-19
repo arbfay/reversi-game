@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <cstdio>
+#include <functional>
 using namespace std;
 
 /**
@@ -19,6 +20,17 @@ Board::Board(){
   board[3][4]='B';
   board[4][4]='W';
   board[4][3]='B';
+  // attribution chiffre a lettre
+  tabL2N['a']=0;
+  tabL2N['b']=1;
+  tabL2N['c']=2;
+  tabL2N['d']=3;
+  tabL2N['e']=4;
+  tabL2N['f']=5;
+  tabL2N['g']=6;
+  tabL2N['h']=7;
+
+
 }
 
 /*
@@ -32,4 +44,27 @@ void Board::display(ostream & out) const{
     for ( char x : board[i]) { cout << ' ' << x; }
     cout<<'\n';
   }
+}
+
+void Board::convert_coord(int coord[],string m){
+
+
+
+  coord[0] = get<1>(*tabL2N.find((char) m[0]));
+  coord[1] = m[1] - '0' ;
+
+
+  coord[1]--;
+
+
+}
+
+
+void Board::move(char color, int nc, int nr){
+
+  board[nr][nc] = color;
+
+}
+array<array<char,SIZE_COL>,SIZE_ROW> Board::boardCopy() const {
+  return board; // copie de board
 }

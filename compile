@@ -1,0 +1,8 @@
+main:main.o
+  g++ -o main -std=c++11 main.o board.o game.o player.
+
+main.o:main.cpp
+  g++ -c main.o -std=c++11 main.cpp board.cpp game.cpp player.cpp
+
+clean :
+  rm -f main.o
