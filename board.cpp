@@ -1,8 +1,5 @@
 #include "main.h"
-#include <iostream>
-#include <string>
-#include <cstdio>
-#include <functional>
+
 using namespace std;
 
 /**
@@ -13,9 +10,16 @@ using namespace std;
 * @output : -
 */
 Board::Board(){
-  for(int i = 0; i<SIZE_COL; i++){ //Complexite = n²
-    board[i].fill('x'); // fonction de complexité n
+  // Remplir le board par des 'x'
+  //array<char,SIZE_ROW> filler;
+  //filler.fill('x');
+  //board.fill(filler);
+  for(int i=0;i<SIZE_COL;i++){
+    for(int j=0;j<SIZE_ROW;j++){
+      board[i][j]='x';
+    }
   }
+
   board[3][3]='W'; //Initialisation des pions de départ
   board[3][4]='B';
   board[4][4]='W';
@@ -29,8 +33,6 @@ Board::Board(){
   tabL2N['f']=5;
   tabL2N['g']=6;
   tabL2N['h']=7;
-
-
 }
 
 /*
@@ -41,30 +43,22 @@ Board::Board(){
 */
 void Board::display(ostream & out) const{
   for(int i=0; i<SIZE_COL; i++){
-    for ( char x : board[i]) { cout << ' ' << x; }
+    for ( char x : *(board+i)) { cout << ' ' << x; }
     cout<<'\n';
   }
 }
 
 void Board::convert_coord(int coord[],string m){
-
-
-
   coord[0] = get<1>(*tabL2N.find((char) m[0]));
   coord[1] = m[1] - '0' ;
-
-
   coord[1]--;
-
-
 }
 
 
 void Board::move(char color, int nc, int nr){
-
   board[nr][nc] = color;
-
 }
-array<array<char,SIZE_COL>,SIZE_ROW> Board::boardCopy() const {
-  return board; // copie de board
+
+tab2d* Board::boardCopy() {
+  return board;
 }

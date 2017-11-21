@@ -6,10 +6,8 @@ using namespace std;
 char choice_menu();
 
 int main(){
-
 	char choice = choice_menu();
 	GameEngine game(choice);
-
 
 	game.launch();
 	return 0;

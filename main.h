@@ -1,23 +1,28 @@
 #include <iostream>
 #include <array>
 #include <string>
+#include <vector>
+#include <utility>
+#include <tuple>
 #include <map>
 #include "constantes.h"
 using namespace std;
 
+typedef char tab2d[SIZE_COL];
 
 class Board{
-  array<array<char,SIZE_COL>,SIZE_ROW> board; //Array d'Arrays
+  //array<array<char,SIZE_COL>,SIZE_ROW> board; //Array d'Arrays
+  tab2d board[SIZE_ROW];
   map<char,int> tabL2N;
 
 
   public:
     void display(ostream & out = cout) const;
     Board();
-    array<array<char,SIZE_COL>,SIZE_ROW> boardCopy() const;
-    void convert_Coord(int coord[],string m) ;// prend int et un char et on renvoi un tqbaleau de int
+    //array<array<char,SIZE_COL>,SIZE_ROW> boardCopy() const;
+    tab2d* boardCopy() ;
+    void convert_coord(int coord[],string m) ;// prend int et un char et on renvoi un tqbaleau de int
     void move(char color, int nc,int nr);
-
 };
 
 
@@ -44,8 +49,8 @@ class GameEngine{
     void move(int nc, int nr);
     string askMove();
     void launch();
-    void wut2flip(vector<int[2]> 2flip, char color,int nc,int nr) const;
-
+    void wut2flip(vector<int[2]> toFlip, char color,int nc,int nr) const;
+    vector<tuple<char,int*>> getPionsEast(int nc, int nr);
 
 };
 
