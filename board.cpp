@@ -16,7 +16,7 @@ Board::Board(){
   //board.fill(filler);
   for(int i=0;i<SIZE_COL;i++){
     for(int j=0;j<SIZE_ROW;j++){
-      board[i][j]='x';
+      board[i][j]='.';
     }
   }
 
@@ -61,4 +61,8 @@ void Board::move(char color, int nc, int nr){
 
 tab2d* Board::boardCopy() {
   return board;
+}
+
+char Board::getCell(int nc, int nr) const {
+  return board[nr][nc];
 }

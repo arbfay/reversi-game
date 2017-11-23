@@ -5,6 +5,8 @@
 #include <utility>
 #include <tuple>
 #include <map>
+#include <chrono>
+#include <thread>
 #include "constantes.h"
 using namespace std;
 
@@ -14,8 +16,6 @@ class Board{
   //array<array<char,SIZE_COL>,SIZE_ROW> board; //Array d'Arrays
   tab2d board[SIZE_ROW];
   map<char,int> tabL2N;
-
-
   public:
     void display(ostream & out = cout) const;
     Board();
@@ -23,6 +23,7 @@ class Board{
     tab2d* boardCopy() ;
     void convert_coord(int coord[],string m) ;// prend int et un char et on renvoi un tqbaleau de int
     void move(char color, int nc,int nr);
+    char getCell(int nc, int nr) const;
 };
 
 
@@ -49,9 +50,9 @@ class GameEngine{
     void move(int nc, int nr);
     string askMove();
     void launch();
-    void wut2flip(vector<int[2]> toFlip, char color,int nc,int nr) const;
-    vector<tuple<char,int*>> getPionsEast(int nc, int nr);
-
+    vector<array<int,2>> wut2flip(int nc,int nr);
+    const vector<tuple<char,int,int>> getPions(int nc, int nr, int direction);
+    void flipAll(vector<array<int,2>> coord2flip);
 };
 
 class Menu{

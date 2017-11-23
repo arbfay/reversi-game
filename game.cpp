@@ -34,11 +34,10 @@ void GameEngine::updateTurnOfPlayer(){
 
 void GameEngine::move(int nc, int nr){
   //Recupérer la ligne (array)
-  if(/*row[nc] != 'x'*/0 ){
+  if(/*row[nc] != '.'*/0 ){
     // Move is invalid
   } else {
       board.move(turnOfPlayer,nc,nr);
-      updateTurnOfPlayer();
   }
 }
 
@@ -52,61 +51,153 @@ string GameEngine::askMove(){
 }
 
 void GameEngine::launch(){
+  string m="";
   do{
     /*demander le move du joueur*/
-    string m = askMove();
+    m = askMove();
     int c[2] ;
     if(m.size() < 3){
       /*executer le move*/
+
       board.convert_coord(c,m);
-      int nc = c[0];
-      int nr = c[1];
-      move(nc, nr);
-      getPionsEast(nc, nr);
+      int nc = c[0]; int nr = c[1];
+      if(board.getCell(nc,nr) == '.'){
+          auto tmp = wut2flip(nc,nr);
+          cout << "Size of tmp : "<<tmp.size() <<endl;
+          if(tmp.size() > 0){
+            flipAll(tmp);
+            move(nc,nr); //ajoute le pion du joueur
+            updateTurnOfPlayer(); //joueur suivant
+          }
+      }
+
       board.display();
     }
     else {
       /*si 'exit', arrêtez le jeu*/
     }
-  }while(1);
+  }while(m !="exit");
 }
 
-void GameEngine::wut2flip(vector<int[2]> toFlip, char color, int nc, int nr) const{
+vector<array<int,2>> GameEngine::wut2flip(int nc, int nr){
 
-  // on veut inscrire les coordonnees des pions a flipper
-  // on
-  //array<array<char,SIZE_COL>,SIZE_ROW> cBoard = board.boardCopy();
+  //char directions[8]={"e","ne","n","nw","w","sw","s","se"};
+  int directions[8]={1,2,3,4,5,6,7,8};
 
-  //tab2d* cBoard = board.boardCopy();
-  /*for(int i = 0; i<=SIZE_COL){
-      if(board[nc][nr])
-    while ()
-  }*/
+  vector<array<int,2>> toFlip;
+  vector<array<int,2>> tmpToFlip;
+  int trigger = 0;
+
+  for(int i=0;i<8;i++){
+    vector<tuple<char,int,int>> dirVectors=getPions(nc,nr,directions[i]); //reçoit le vecteur des pions dans toutes les directions
+
+    for(int j=0; j < dirVectors.size() ; j++){
+      tuple<char,int,int>tup = dirVectors.at(j);
+      trigger = 0;
+
+      char tmpChar = get<0>(tup);
+      int tmpCoordC = get<1>(tup);
+      int tmpCoordR = get<2>(tup);
+      cout << "tmpChar: " << tmpChar << endl;
+      cout << "turnOfPlayer: " << turnOfPlayer << endl;
+      std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
+      if(tmpChar != turnOfPlayer){ //tant qu'on arrive pas à char égal à celui du joueur, c'est que le pion est à tourner
+
+          array<int,2> tmp ={tmpCoordC, tmpCoordR};
+          tmpToFlip.push_back(tmp);
+      }
+
+      if(tmpChar == turnOfPlayer) {
+        trigger = 1;
+        j = dirVectors.size()+1;
+      }
+    }// fin de la boucle for sur un des vecteurs directionnels
+
+    if(trigger==0){
+      cout<<"clear de vector | "<< turnOfPlayer  <<endl;
+      tmpToFlip.clear();
+    } else {
+      //insert tmpToFlip in toFlip
+      toFlip.insert(toFlip.end(), tmpToFlip.begin(), tmpToFlip.end());
+    }
+
+  }//fin de la boucle for sur tous les vecteurs
+
+  return toFlip;
 }
 
-vector<tuple<char,int*>> GameEngine::getPionsEast(int nc, int nr){
-      //On va récupérer la ligne nr du board et regarder toutes les valeurs à droite
-      //de la position nc jusqu'à ce qu'on voit un 'x'
+const vector<tuple<char,int,int>> GameEngine::getPions(int nc, int nr, int direction){
+  //1- Récupérer la ligne nr du board
+  tab2d* cBoard = board.boardCopy();
 
-      //1- Récupérer la ligne nr du board
-      tab2d* cBoard = board.boardCopy();
-      char* r = cBoard[nr];
-      char* row =r+nc;
+  //2- Itérer sur ]nc, SIZE_ROW] en s'arrêtent à '.' et enregistrer la série de lettre dans un vector
+  vector<tuple<char,int,int>> results;
 
-      //2- Itérer sur ]nc, SIZE_ROW] en s'arrêtent à 'x' et enregistrer la série de lettre dans un vector
-      vector<tuple<char,int*>> results;
-      for(int i = 1; i<SIZE_ROW;i++){
-        if(row[i]!='x'){
-          int coord[2] = {nc,nr+i};
-          auto tmp = make_tuple(row[i], coord);
-          results.push_back(tmp);
-        } else {
-          i=SIZE_ROW+1;
-        }
-      }
+  char elem;
+  int coord[2];
 
-      for(tuple<char,int*> x : results){
-        cout << get<0>(x) <<endl;
-      }
-      return results;
+  for(int i = 1; i<SIZE_ROW;i++){
+    switch(direction){
+      case 1:
+        elem=cBoard[nr][nc+i];
+        coord[0]=nc+i;
+        coord[1]=nr;
+        break;
+      case 2:
+        elem=cBoard[nr-i][nc+i];
+        coord[0]=nc+i;
+        coord[1]=nr-i;
+        break;
+      case 3:
+        elem=cBoard[nr-i][nc];
+        coord[0]=nc;
+        coord[1]=nr-i;
+        break;
+      case 4:
+        elem=cBoard[nr-i][nc-i];
+        coord[0]=nc-i;
+        coord[1]=nr-i;
+        break;
+      case 5:
+        elem=cBoard[nr][nc-i];
+        coord[0]=nc-i;
+        coord[1]=nr;
+        break;
+      case 6:
+        elem=cBoard[nr+i][nc-i];
+        coord[0]=nc-i;
+        coord[1]=nr+i;
+        break;
+      case 7:
+        elem=cBoard[nr+i][nc];
+        coord[0]=nc;
+        coord[1]=nr+i;
+        break;
+      case 8:
+        elem=cBoard[nr+i][nc-i];
+        coord[0]=nc-i;
+        coord[1]=nr+i;
+        break;
+    }
+
+    if(elem!='.'){
+      auto tmp = make_tuple(elem, coord[0], coord[1]);
+      cout<<elem;
+      cout<<'('<<coord[1]<<','<<coord[0]<<") " ;
+      //results.insert(results.begin(), tmp);
+      results.push_back(tmp);
+    } else {
+      i=SIZE_ROW+1;
+    }
+  }
+
+  return results;
+}
+
+void GameEngine::flipAll(vector<array<int,2>> coord2flip){
+  for(int i = 0; i<coord2flip.size();i++){
+    array<int,2> tmp = coord2flip.at(i);
+    move(tmp[0],tmp[1]);
+  }
 }
