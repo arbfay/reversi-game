@@ -63,14 +63,13 @@ void GameEngine::launch(){
       int nc = c[0]; int nr = c[1];
       if(board.getCell(nc,nr) == '.'){
           auto tmp = wut2flip(nc,nr);
-          cout << "Size of tmp : "<<tmp.size() <<endl;
           if(tmp.size() > 0){
             flipAll(tmp);
             move(nc,nr); //ajoute le pion du joueur
             updateTurnOfPlayer(); //joueur suivant
           }
       }
-
+      system("clear");
       board.display();
     }
     else {
@@ -89,6 +88,7 @@ vector<array<int,2>> GameEngine::wut2flip(int nc, int nr){
   int trigger = 0;
 
   for(int i=0;i<8;i++){
+
     vector<tuple<char,int,int>> dirVectors=getPions(nc,nr,directions[i]); //reçoit le vecteur des pions dans toutes les directions
 
     for(int j=0; j < dirVectors.size() ; j++){
@@ -98,32 +98,23 @@ vector<array<int,2>> GameEngine::wut2flip(int nc, int nr){
       char tmpChar = get<0>(tup);
       int tmpCoordC = get<1>(tup);
       int tmpCoordR = get<2>(tup);
-      cout << "tmpChar: " << tmpChar << endl;
-      cout << "turnOfPlayer: " << turnOfPlayer << endl;
-      std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
       if(tmpChar != turnOfPlayer){ //tant qu'on arrive pas à char égal à celui du joueur, c'est que le pion est à tourner
-
           array<int,2> tmp ={tmpCoordC, tmpCoordR};
           tmpToFlip.push_back(tmp);
       }
-
       if(tmpChar == turnOfPlayer) {
         trigger = 1;
         j = dirVectors.size()+1;
       }
     }// fin de la boucle for sur un des vecteurs directionnels
-
     if(trigger==0){
-      cout<<"clear de vector | "<< turnOfPlayer  <<endl;
       tmpToFlip.clear();
     } else {
       //insert tmpToFlip in toFlip
       toFlip.insert(toFlip.end(), tmpToFlip.begin(), tmpToFlip.end());
     }
-
   }//fin de la boucle for sur tous les vecteurs
-
   return toFlip;
 }
 
@@ -183,8 +174,6 @@ const vector<tuple<char,int,int>> GameEngine::getPions(int nc, int nr, int direc
 
     if(elem!='.'){
       auto tmp = make_tuple(elem, coord[0], coord[1]);
-      cout<<elem;
-      cout<<'('<<coord[1]<<','<<coord[0]<<") " ;
       //results.insert(results.begin(), tmp);
       results.push_back(tmp);
     } else {
