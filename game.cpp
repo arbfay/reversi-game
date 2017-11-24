@@ -52,6 +52,7 @@ string GameEngine::askMove(){
 
 void GameEngine::launch(){
   string m="";
+  int nombreCoup=4;
   do{
     /*demander le move du joueur*/
     m = askMove();
@@ -69,13 +70,31 @@ void GameEngine::launch(){
             updateTurnOfPlayer(); //joueur suivant
           }
       }
+      //cout<<nombreCoup<<endl;
+
       system("clear");
       board.display();
+      nombreCoup++;
+      cout<<nombreCoup<<endl;
+      //for(int i =0; j<SIZE_COL;i++)
     }
+
     else {
       /*si 'exit', arrêtez le jeu*/
     }
-  }while(m !="exit");
+  }while(nombreCoup != 64 && m !="exit" );
+
+  int counter[2];
+  board.countPions(counter);
+
+  if(counter[0] < counter[1]){
+    cout<<"le joueur W a remporte : "<<counter[1]<<endl;
+  }
+  else if (counter[0] > counter[1]){
+    cout<<"le joueur B a remporte : "<<counter[0]<<endl;
+  }
+  else{cout<<"Match nul"<<endl;}
+
 }
 
 vector<array<int,2>> GameEngine::wut2flip(int nc, int nr){
@@ -166,8 +185,8 @@ const vector<tuple<char,int,int>> GameEngine::getPions(int nc, int nr, int direc
         coord[1]=nr+i;
         break;
       case 8:
-        elem=cBoard[nr+i][nc-i];
-        coord[0]=nc-i;
+        elem=cBoard[nr+i][nc+i];
+        coord[0]=nc+i;
         coord[1]=nr+i;
         break;
     }

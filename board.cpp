@@ -35,10 +35,15 @@ Board::Board(){
 * @output : -
 */
 void Board::display(ostream & out) const{
+  cout<<"  a b c d e f g h"<<endl;
   for(int i=0; i<SIZE_COL; i++){
+    cout<<i+1;
     for ( char x : *(board+i)) { cout << ' ' << x; }
+    cout<<' ';
+    cout<<i+1<<endl;
     cout<<'\n';
   }
+  cout<<"  a b c d e f g h"<<endl;
 }
 
 /*
@@ -58,7 +63,7 @@ void Board::convert_coord(int coord[],string m){
 /*
 * @arg : color est la lettre à placer sur le board (W ou B), nc est la numéro de
 *        la colonne (entre 0 et 7) et nr le numéro de la rangée (entre 0 et 7)
-* @process : 
+* @process :
 * @output : -
 */
 void Board::move(char color, int nc, int nr){
@@ -71,4 +76,22 @@ tab2d* Board::boardCopy() {
 
 char Board::getCell(int nc, int nr) const {
   return board[nr][nc];
+}
+
+void Board::countPions(int tab[]){
+  int counterW = 0;
+  int counterB = 0;
+  for(int i=0; i<SIZE_COL;i++){
+    for(int j = 0; j<SIZE_ROW; j++ ){
+      if( board[i][j] == 'W'){
+        counterW++;
+      }
+      else if(board[i][j] == 'B'){
+        counterB++;
+      }
+    }
+  }
+
+  tab[0] = counterB;
+  tab[1] = counterW;
 }

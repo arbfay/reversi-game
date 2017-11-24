@@ -24,6 +24,7 @@ class Board{
     void convert_coord(int coord[],string m) ;// prend int et un char et on renvoi un tqbaleau de int
     void move(char color, int nc,int nr);
     char getCell(int nc, int nr) const;
+    void countPions(int tab[]);
 };
 
 
