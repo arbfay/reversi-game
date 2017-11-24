@@ -59,7 +59,6 @@ void GameEngine::launch(){
     int c[2] ;
     if(m.size() < 3){
       /*executer le move*/
-
       board.convert_coord(c,m);
       int nc = c[0]; int nr = c[1];
       if(board.getCell(nc,nr) == '.'){
@@ -68,22 +67,19 @@ void GameEngine::launch(){
             flipAll(tmp);
             move(nc,nr); //ajoute le pion du joueur
             updateTurnOfPlayer(); //joueur suivant
+            nombreCoup++;
           }
       }
-      //cout<<nombreCoup<<endl;
 
       system("clear");
       board.display();
-      nombreCoup++;
-      cout<<nombreCoup<<endl;
-      //for(int i =0; j<SIZE_COL;i++)
+      //cout<<nombreCoup<<endl;
     }
 
-    else {
-      /*si 'exit', arrêtez le jeu*/
+    else if(m=="next"){ // Commande pour passer son tour
+      updateTurnOfPlayer();
     }
-  }while(nombreCoup != 64 && m !="exit" );
-
+  } while(nombreCoup != 64 && m !="exit");
   int counter[2];
   board.countPions(counter);
 
@@ -146,7 +142,7 @@ const vector<tuple<char,int,int>> GameEngine::getPions(int nc, int nr, int direc
 
   char elem;
   int coord[2];
-
+  //cout<<"Direction : "<<direction<<endl;
   for(int i = 1; i<SIZE_ROW;i++){
     switch(direction){
       case 1:
@@ -191,7 +187,8 @@ const vector<tuple<char,int,int>> GameEngine::getPions(int nc, int nr, int direc
         break;
     }
 
-    if(elem!='.'){
+    if(elem != '.' && (elem == 'W' || elem == 'B') && (coord[0]>=0 && coord[1]>=0) && (coord[0]<SIZE_COL && coord[1]<SIZE_ROW)){
+      //cout<<elem<<" ("<<coord[0]<<", "<<coord[1]<<")"<<endl;
       auto tmp = make_tuple(elem, coord[0], coord[1]);
       //results.insert(results.begin(), tmp);
       results.push_back(tmp);

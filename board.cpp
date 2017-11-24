@@ -40,7 +40,7 @@ void Board::display(ostream & out) const{
     cout<<i+1;
     for ( char x : *(board+i)) { cout << ' ' << x; }
     cout<<' ';
-    cout<<i+1<<endl;
+    cout<<i+1;
     cout<<'\n';
   }
   cout<<"  a b c d e f g h"<<endl;
