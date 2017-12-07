@@ -3,13 +3,23 @@
 #include "main.h"
 using namespace std;
 
+int boardWeights[8][8]={{10,-10,5,5,5,5,-10,10},
+  {-10,-10,-5,-5,-5,-5,-10,-10},
+  {5,-5,0,0,0,0,-5,5},
+  {5,-5,0,0,0,0,-5,5},
+  {5,-5,0,0,0,0,-5,5},
+  {5,-5,0,0,0,0,-5,5},
+  {-10,-10,-5,-5,-5,-5,-10,-10},
+  {10,-10,5,5,5,5,-10,10}};
 char choice_menu();
 
 int main(){
 	char choice = choice_menu();
 	GameEngine game(choice);
 
+	game.setGameEngine(&game);
 	game.launch();
+
 	return 0;
 }
 
