@@ -37,14 +37,16 @@ class Board{
 class Player{
   char type; //H for human or F for file or A for artificial intelligence
   char color; //W for white & B for black
-  char* name; //'Skynet' for AI, ask player's name otherwise
+  string name; //'Skynet' for AI, ask player's name otherwise
   public:
     char getType() const;
     char getColor() const;
+    string getName() const;
     void print(ostream & out = cout) const;
     Player(char typ, char col, char* name);
     Player(char typ, char col);
     Player();
+    void setName(string n);
     //virtual string askMove();
 };
 

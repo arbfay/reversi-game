@@ -40,7 +40,13 @@ void GameEngine::move(int nc, int nr){
 
 string GameEngine::askMove(){
   string result;
-  cout<<"Le joueur "<<turnOfPlayer<<", entrez votre coup (ex: c4) : "<<endl;
+  string name;
+  if(turnOfPlayer=='W'){
+    name = player1.getName();
+  } else {
+    name = player2.getName();
+  }
+  cout<< name <<"("<<turnOfPlayer<<"), entrez votre coup (ex: c4) : "<<endl;
   cin >> result;
   //result = tolower(result);
 
@@ -50,6 +56,15 @@ string GameEngine::askMove(){
 void GameEngine::launch(){
   string m="";
   int nombreCoup=4;
+
+  string res;
+  cout<<"Comment s'appelle le joueur aux pions noirs (B) ? "<<endl;
+  cin >> res;
+  player2.setName(res);
+  cout<<"Et le joueur aux pions blancs (W) ? "<<endl;
+  cin >> res;
+  player1.setName(res);
+
   do{
     /*demander le move du joueur*/
     m = askMove();
