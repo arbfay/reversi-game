@@ -110,36 +110,42 @@ vector<array<int,2>> Board::wut2flip(int nc, int nr){
   vector<array<int,2>> tmpToFlip;
   int trigger = 0;
   char turnOfPlayer = game->getTurnOfPlayer();
-  cout<<turnOfPlayer<<endl;
-  for(int i=0;i<8;i++){
+  //out<<turnOfPlayer<<endl;
 
-    vector<tuple<char,int,int>> dirVectors=getPions(nc,nr,directions[i]); //reçoit le vecteur des pions dans toutes les directions
+  //probleme avec cette condition IF notre programme ne veux plus nous laisser placer les pieces 
+  if(board[nc][nr] != '.'){
+    return toFlip;
+  }else{
+    for(int i=0;i<8;i++){
 
-    for(int j=0; j < dirVectors.size() ; j++){
-      tuple<char,int,int>tup = dirVectors.at(j);
-      trigger = 0;
+      vector<tuple<char,int,int>> dirVectors=getPions(nc,nr,directions[i]); //reçoit le vecteur des pions dans toutes les directions
 
-      char tmpChar = get<0>(tup);
-      int tmpCoordC = get<1>(tup);
-      int tmpCoordR = get<2>(tup);
+      for(int j=0; j < dirVectors.size() ; j++){
+        tuple<char,int,int>tup = dirVectors.at(j);
+        trigger = 0;
 
-      if(tmpChar != turnOfPlayer){ //tant qu'on arrive pas à char égal à celui du joueur, c'est que le pion est à tourner
-          array<int,2> tmp ={tmpCoordC, tmpCoordR};
-          tmpToFlip.push_back(tmp);
+        char tmpChar = get<0>(tup);
+        int tmpCoordC = get<1>(tup);
+        int tmpCoordR = get<2>(tup);
+
+        if(tmpChar != turnOfPlayer){ //tant qu'on arrive pas à char égal à celui du joueur, c'est que le pion est à tourner
+            array<int,2> tmp ={tmpCoordC, tmpCoordR};
+            tmpToFlip.push_back(tmp);
+        }
+        if(tmpChar == turnOfPlayer) {
+          trigger = 1;
+          j = dirVectors.size()+1;
+        }
+      }// fin de la boucle for sur un des vecteurs directionnels
+      if(trigger==0){
+        tmpToFlip.clear();
+      } else {
+        //insert tmpToFlip in toFlip
+        toFlip.insert(toFlip.end(), tmpToFlip.begin(), tmpToFlip.end());
       }
-      if(tmpChar == turnOfPlayer) {
-        trigger = 1;
-        j = dirVectors.size()+1;
-      }
-    }// fin de la boucle for sur un des vecteurs directionnels
-    if(trigger==0){
-      tmpToFlip.clear();
-    } else {
-      //insert tmpToFlip in toFlip
-      toFlip.insert(toFlip.end(), tmpToFlip.begin(), tmpToFlip.end());
-    }
-  }//fin de la boucle for sur tous les vecteurs
-  return toFlip;
+    }//fin de la boucle for sur tous les vecteurs
+    return toFlip;
+  }
 }
 
 const vector<tuple<char,int,int>> Board::getPions(int nc, int nr, int direction){
@@ -225,5 +231,86 @@ void Board::flipAll(vector<array<int,2>> coord2flip, int virtuality, char color)
 
 void Board::setGameEngine(GameEngine* ptr){
   game = ptr;
+
+}
+
+
+vector<array<int,2>> Board::whatLegalMoves(char color){
+
+
+  vector<array<int,2>> results;
+  //trouver la liste des cases vides "." des pions de couleurs !color
+  //calculer les gains potentiels de chacune de ces cases
+  // si on a un gain, on garde la case
+  //retourner les cases avec gains
+
+  for(int i=0;i<SIZE_COL;i++){
+    for(int j=0;j<SIZE_ROW;j++){
+
+
+
+      char c = board[i][j];
+
+
+      if(c != color && c != '.'){
+        vector<array<int,2>> east = wut2flip(i+1,j);
+        if(east.size() > 0){
+          results.insert(results.end(),east.begin(),east.end());
+        }
+
+        vector<array<int,2>> neast = wut2flip(i+1,j-1);
+        if(neast.size() > 0){
+          results.insert(results.end(),neast.begin(),neast.end());
+        }
+
+        vector<array<int,2>> north = wut2flip(i,j-1);
+        if(north.size() > 0){
+          results.insert(results.end(),north.begin(),north.end());
+        }
+
+
+        vector<array<int,2>> nwest = wut2flip(i-1,j-1);
+        if(nwest.size() > 0){
+          results.insert(results.end(),nwest.begin(),nwest.end());
+        }
+
+
+
+        vector<array<int,2>> west = wut2flip(i-1,j);
+        if(west.size() > 0){
+          results.insert(results.end(),west.begin(),west.end());
+        }
+
+
+        vector<array<int,2>> swest = wut2flip(i-1,j+1);
+        if(swest.size() > 0){
+          results.insert(results.end(),swest.begin(),swest.end());
+        }
+
+
+        vector<array<int,2>> south = wut2flip(i,j+1);
+        if(south.size() > 0){
+          results.insert(results.end(),south.begin(),south.end());
+        }
+
+
+        vector<array<int,2>> seast = wut2flip(i+1,j+1);
+        if(seast.size() > 0){
+          results.insert(results.end(),seast.begin(),seast.end());
+
+
+        /*if(tmp.size() > 0){
+          print(tmp);
+          array<int,2> coord = {i,j};
+          results.push_back(coord);*/
+
+        }
+      }
+    }
+  }
+
+  return results;
+
+
 
 }
