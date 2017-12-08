@@ -41,12 +41,9 @@ void GameEngine::move(int nc, int nr){
 string GameEngine::askMove(){
   string result;
   string name;
-  if(turnOfPlayer=='W'){
-    name = player1.getName();
-  } else {
-    name = player2.getName();
-  }
-  cout<< name <<"("<<turnOfPlayer<<"), entrez votre coup (ex: c4) : "<<endl;
+  name = (turnOfPlayer=='W') ? player1.getName() : player2.getName();
+
+  cout<< name <<" ("<<turnOfPlayer<<"), entrez votre coup (ex: c4) : "<<endl;
   cin >> result;
   //result = tolower(result);
 
