@@ -51,6 +51,8 @@ string GameEngine::askMove(){
 }
 
 void GameEngine::launch(){
+  system("clear");
+  board.display();
   string m="";
   int nombreCoup=4;
 
@@ -58,21 +60,29 @@ void GameEngine::launch(){
   cout<<"Comment s'appelle le joueur aux pions noirs (B) ? "<<endl;
   cin >> res;
   player2.setName(res);
-  cout<<"Et le joueur aux pions blancs (W) ? "<<endl;
+  cout<<"\nEt le joueur aux pions blancs (W) ? "<<endl;
   cin >> res;
   player1.setName(res);
 
+  //test de Skynet
+  askSkynetMove();
+  //fn de test
+
   do{
     /*demander le move du joueur*/
+    auto lm=board.whatLegalMoves(turnOfPlayer);
+    print(lm);
     m = askMove();
     int c[2] ;
     if(m.size() < 3){
       /*executer le move*/
       board.convert_coord(c,m);
       int nc = c[0]; int nr = c[1];
-      if(board.getCell(nc,nr) == '.'){
-          auto tmp = board.wut2flip(nc,nr);
-          cout<<tmp.size()<<endl;
+      char cell = board.getCell(nc,nr);
+      if( cell != 'W' && cell != 'B'){
+          auto tmp = board.wut2flip(turnOfPlayer,nc,nr);
+          print(tmp);
+          //cout<<tmp.size()<<endl;
           if(tmp.size() > 0){
             board.flipAll(tmp);
             move(nc,nr); //ajoute le pion du joueur

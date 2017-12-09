@@ -33,3 +33,11 @@ char choice_menu(){
 	} while(choice != 'H' && choice != 'A' && choice != 'F');
 	return choice;
 }
+
+void print(vector<array<int,2>> vec){
+  cout<<"Impression de vector : "<<endl;
+  for(int i=0; i<vec.size();i++){
+    array<int,2> arr = vec.at(i);
+    cout<<"Element "<<i<<" : ("<< get<0>(arr) <<", "<<get<1>(arr) <<") "<<endl;
+  }
+}

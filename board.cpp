@@ -101,7 +101,7 @@ void Board::countPions(int tab[]){
   tab[1] = counterW;
 }
 
-vector<array<int,2>> Board::wut2flip(int nc, int nr){
+vector<array<int,2>> Board::wut2flip(char color, int nc, int nr){
 
   //char directions[8]={"e","ne","n","nw","w","sw","s","se"};
   int directions[8]={1,2,3,4,5,6,7,8};
@@ -109,37 +109,40 @@ vector<array<int,2>> Board::wut2flip(int nc, int nr){
   vector<array<int,2>> toFlip;
   vector<array<int,2>> tmpToFlip;
   int trigger = 0;
-  char turnOfPlayer = game->getTurnOfPlayer();
-  cout<<turnOfPlayer<<endl;
-  for(int i=0;i<8;i++){
+  char turnOfPlayer = color;
+    for(int i=0; i<8; i++){
+      vector<tuple<char,int,int>> dirVectors=getPions(nc,nr,directions[i]); //reçoit le vecteur des pions dans toutes les directions
 
-    vector<tuple<char,int,int>> dirVectors=getPions(nc,nr,directions[i]); //reçoit le vecteur des pions dans toutes les directions
+      for(int j=0; j < dirVectors.size() ; j++){
+        tuple<char,int,int>tup = dirVectors.at(j);
+        trigger = 0;
 
-    for(int j=0; j < dirVectors.size() ; j++){
-      tuple<char,int,int>tup = dirVectors.at(j);
-      trigger = 0;
+        char tmpChar = get<0>(tup);
+        int tmpCoordC = get<1>(tup);
+        int tmpCoordR = get<2>(tup);
+        //cout<<"tuple : ("<<tmpChar<<", "<< tmpCoordC << ", "<< tmpCoordR <<")"<<endl;
 
-      char tmpChar = get<0>(tup);
-      int tmpCoordC = get<1>(tup);
-      int tmpCoordR = get<2>(tup);
+        if(tmpChar != turnOfPlayer ){ //tant qu'on arrive pas à char égal à celui du joueur, c'est que le pion est à tourner
+            array<int,2> tmp = {tmpCoordC, tmpCoordR};
+            tmpToFlip.push_back(tmp);
+        }
+        if(tmpChar == turnOfPlayer) {
+          trigger = 1;
+          j = dirVectors.size()+1;
+        }
+      }// fin de la boucle for sur un des vecteurs directionnels
 
-      if(tmpChar != turnOfPlayer){ //tant qu'on arrive pas à char égal à celui du joueur, c'est que le pion est à tourner
-          array<int,2> tmp ={tmpCoordC, tmpCoordR};
-          tmpToFlip.push_back(tmp);
+      if(trigger==0){
+        tmpToFlip.clear();
+      } else {
+        //insert tmpToFlip in toFlip
+        //cout<<"wut2flip (tmp) size : "<< tmpToFlip.size()<<endl;
+        toFlip.insert(toFlip.end(), tmpToFlip.begin(), tmpToFlip.end());
+        tmpToFlip.clear();
       }
-      if(tmpChar == turnOfPlayer) {
-        trigger = 1;
-        j = dirVectors.size()+1;
-      }
-    }// fin de la boucle for sur un des vecteurs directionnels
-    if(trigger==0){
-      tmpToFlip.clear();
-    } else {
-      //insert tmpToFlip in toFlip
-      toFlip.insert(toFlip.end(), tmpToFlip.begin(), tmpToFlip.end());
-    }
-  }//fin de la boucle for sur tous les vecteurs
-  return toFlip;
+    }//fin de la boucle for sur tous les vecteurs
+    //cout<<"wut2flip size : "<< toFlip.size()<<endl;
+    return toFlip;
 }
 
 const vector<tuple<char,int,int>> Board::getPions(int nc, int nr, int direction){
@@ -225,5 +228,73 @@ void Board::flipAll(vector<array<int,2>> coord2flip, int virtuality, char color)
 
 void Board::setGameEngine(GameEngine* ptr){
   game = ptr;
-
 }
+
+vector<array<int,2>> Board::whatLegalMoves(char color){//quels sont les moves legaux pour cette couleur
+
+  set<array<int,2>> results;
+
+  //Liste des cases vides autour des pions de couleur !color
+  for(int i=0;i<SIZE_COL;i++){
+    for(int j=0; j<SIZE_ROW; j++){
+      char c = board[i][j];
+      //Calculer les gains potentiels pour chacune de ces cases
+      //Si gain dans au moins une direction, on garde la case
+      if(c != color && c != '.'){
+          vector<array<int,2>> east = wut2flip(color,i+1,j); // verifier que [i+1,j] est '.'
+          vector<array<int,2>> neast = wut2flip(color,i+1,j-1);
+          vector<array<int,2>> north = wut2flip(color,i,j-1);
+          vector<array<int,2>> nwest = wut2flip(color,i-1,j-1);
+          vector<array<int,2>> west = wut2flip(color,i-1,j);
+          vector<array<int,2>> swest = wut2flip(color,i-1,j+1);
+          vector<array<int,2>> south = wut2flip(color,i,j+1);
+          vector<array<int,2>> seast = wut2flip(color,i+1,j+1);
+
+          if(east.size() > 0){
+            array<int,2> coord = {i+1,j};
+            results.emplace(coord);
+            east.clear();
+          }
+          if(neast.size() > 0){
+            array<int,2> coord = {i+1,j-1};
+            results.emplace(coord);
+            neast.clear();
+          }
+          if(north.size() > 0){
+            array<int,2> coord = {i,j-1};
+            results.emplace(coord);
+            north.clear();
+          }
+          if(nwest.size() > 0){
+            array<int,2> coord = {i-1,j-1};
+            results.emplace(coord);
+            nwest.clear();
+          }
+          if(west.size() > 0){
+            array<int,2> coord = {i-1,j};
+            results.emplace(coord);
+            west.clear();
+          }
+          if(swest.size() > 0){
+            array<int,2> coord = {i-1,j+1};
+            results.emplace(coord);
+            swest.clear();
+          }
+          if(south.size() > 0){
+            array<int,2> coord = {i,j+1};
+            results.emplace(coord);
+            south.clear();
+          }
+          if(seast.size() > 0){
+            array<int,2> coord = {i+1,j+1};
+            results.emplace(coord);
+            seast.clear();
+          }
+      }
+    }
+  }
+  //Retourner les cases avec gain
+  //print(results);
+  vector<array<int,2>> toReturn(results.begin(), results.end());
+  return toReturn;
+};

@@ -2,6 +2,7 @@
 #include <array>
 #include <string>
 #include <vector>
+#include <set>
 #include <utility>
 #include <tuple>
 #include <map>
@@ -12,6 +13,7 @@ using namespace std;
 
 typedef char tab2d[SIZE_COL];
 class GameEngine;
+void print(vector<array<int,2>> vec);
 
 class Board{
   tab2d board[SIZE_ROW];
@@ -27,10 +29,10 @@ class Board{
     void move(char color, int nc,int nr);
     char getCell(int nc, int nr) const;
     void countPions(int tab[]);
-    vector<array<int,2>> wut2flip(int nc,int nr);
+    vector<array<int,2>> wut2flip(char color, int nc,int nr);
     const vector<tuple<char,int,int>> getPions(int nc, int nr, int direction);
     void flipAll(vector<array<int,2>> coord2flip, int virtuality=0, char color='.');
-    //vector<array<int,2>> whatLegalMoves(); pour avoir tous les moves legaux
+    vector<array<int,2>> whatLegalMoves(char color);
 };
 
 
@@ -50,15 +52,6 @@ class Player{
     //virtual string askMove();
 };
 
-class Skynet: public Player{ // Ceci n'est pas une IA
-  //int difficulty; (eventuellement)
-  public:
-    Skynet(char col);
-    //string askMove(); re-implementer askMove pour l'IA
-    //vector<array<int,2>> filterMoves(); selectionne les moves sur lesquels
-    //void monteCarlo(); calcule la probabilité d'avoir un succès selon un move
-};
-
 class GameEngine{
   Player player1;
   Player player2;
@@ -72,7 +65,10 @@ class GameEngine{
     void setGameEngine(GameEngine* ptr);
     void launch();
     char getTurnOfPlayer();
-    vector<array<int,2>> wut2flip(int nc,int nr); //la déplacer dans Board
-    const vector<tuple<char,int,int>> getPions(int nc, int nr, int direction);//la déplacer dans Board
-    void flipAll(vector<array<int,2>> coord2flip);// la déplacer dans Board
+    string askSkynetMove();
+    vector<array<int,2>> filterMoves();
+    void monteCarlo();
+    //vector<array<int,2>> wut2flip(int nc,int nr); //la déplacer dans Board
+    //const vector<tuple<char,int,int>> getPions(int nc, int nr, int direction);//la déplacer dans Board
+    //void flipAll(vector<array<int,2>> coord2flip);// la déplacer dans Board
 };
