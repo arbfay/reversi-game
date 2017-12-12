@@ -33,6 +33,14 @@ Board::Board(){
   game = ptrGame;
 }*/
 
+Board::Board(tab2d* init){
+  for(int i=0; i<SIZE_COL;i++){
+    for(int j=0; i<SIZE_ROW; j++){
+      board[i][j] = init[i][j];
+    }
+  }
+}
+
 /*
 * @arg : objet ostream
 * @process : ajoute chaque élément de chaque ligne du board à l'objet ostream
@@ -101,6 +109,8 @@ void Board::countPions(int tab[]){
   tab[1] = counterW;
 }
 
+// les coord en sortie sont dans l'ordre "COL, ROW"
+// mais le board est organisé en "ROW, COL"
 vector<array<int,2>> Board::wut2flip(char color, int nc, int nr){
 
   //char directions[8]={"e","ne","n","nw","w","sw","s","se"};
@@ -110,6 +120,7 @@ vector<array<int,2>> Board::wut2flip(char color, int nc, int nr){
   vector<array<int,2>> tmpToFlip;
   int trigger = 0;
   char turnOfPlayer = color;
+  if(board[nr][nc] == '.'){
     for(int i=0; i<8; i++){
       vector<tuple<char,int,int>> dirVectors=getPions(nc,nr,directions[i]); //reçoit le vecteur des pions dans toutes les directions
 
@@ -140,7 +151,8 @@ vector<array<int,2>> Board::wut2flip(char color, int nc, int nr){
         toFlip.insert(toFlip.end(), tmpToFlip.begin(), tmpToFlip.end());
         tmpToFlip.clear();
       }
-    }//fin de la boucle for sur tous les vecteurs
+    }
+  }//fin de la boucle for sur tous les vecteurs
     //cout<<"wut2flip size : "<< toFlip.size()<<endl;
     return toFlip;
 }
@@ -237,10 +249,12 @@ vector<array<int,2>> Board::whatLegalMoves(char color){//quels sont les moves le
   //Liste des cases vides autour des pions de couleur !color
   for(int i=0;i<SIZE_COL;i++){
     for(int j=0; j<SIZE_ROW; j++){
-      char c = board[i][j];
+      char c = board[j][i];
+
       //Calculer les gains potentiels pour chacune de ces cases
       //Si gain dans au moins une direction, on garde la case
       if(c != color && c != '.'){
+          cout<< "Char c : "<< c << ", color : "<< color <<endl;
           vector<array<int,2>> east = wut2flip(color,i+1,j); // verifier que [i+1,j] est '.'
           vector<array<int,2>> neast = wut2flip(color,i+1,j-1);
           vector<array<int,2>> north = wut2flip(color,i,j-1);

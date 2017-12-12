@@ -10,6 +10,8 @@
 #include <thread>
 #include "constantes.h"
 #include <time.h>
+#include <algorithm>
+#include <random>
 
 using namespace std;
 
@@ -27,7 +29,7 @@ class Board{
   public:
     void display(ostream & out = cout) const;
     Board();
-    //Board(GameEngine * ptrGame);
+    Board(tab2d* init);
     tab2d* boardCopy();
     void setGameEngine(GameEngine* ptr);
     void convert_coord(int coord[],string m) ;// prend int et un char et on renvoi un tqbaleau de int
@@ -71,8 +73,8 @@ class GameEngine{
     void launch();
     char getTurnOfPlayer();
     string askSkynetMove();
-    vector<array<int,2>> filterMoves();
-    void monteCarlo();
+    vector<array<int,2>> filterMoves(vector<array<int,2>> legalMoves);
+    float montecarlo(array<int,2> move, char color);
     //vector<array<int,2>> wut2flip(int nc,int nr); //la déplacer dans Board
     //const vector<tuple<char,int,int>> getPions(int nc, int nr, int direction);//la déplacer dans Board
     //void flipAll(vector<array<int,2>> coord2flip);// la déplacer dans Board

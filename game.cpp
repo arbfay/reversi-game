@@ -65,13 +65,22 @@ void GameEngine::launch(){
   player1.setName(res);
 
   //test de Skynet
-  askSkynetMove();
+  //askSkynetMove();
   //fn de test
 
   do{
     /*demander le move du joueur*/
     auto lm=board.whatLegalMoves(turnOfPlayer);
-    print(lm);
+    //cout<<"Legal moves"<<endl;
+    //print(lm);
+
+    //cout<<"Filtered legal moves"<<endl;
+    auto flm=filterMoves(lm);
+    //print(flm);
+    float mc = montecarlo(flm.at(0), 'B');
+    //cout << mc << endl;
+    this_thread::sleep_for(chrono::milliseconds(1000));
+
     m = askMove();
     int c[2] ;
     if(m.size() < 3){
@@ -119,4 +128,58 @@ char GameEngine::getTurnOfPlayer(){
 
 void GameEngine::setGameEngine(GameEngine* ptr){
   board.setGameEngine(ptr);
+}
+
+bool compareCoord (array<int,2> a, array<int,2> b){
+  return boardWeights[get<0>(a)][get<1>(a)] >= boardWeights[get<0>(b)][get<1>(b)];
+}
+
+vector<array<int,2>> GameEngine::filterMoves(vector<array<int,2>> legalMoves){
+    // on va utiliser 'sort' de complexite nlogn avec cette fonction de comparaison
+    sort(legalMoves.begin(), legalMoves.end(), compareCoord);
+
+    // nous gardons uniquement les 3 premiers elements de legalMoves triés
+    legalMoves.erase(legalMoves.begin()+3, legalMoves.end());
+
+    return legalMoves;
+}
+
+// color = couleur de Skynet
+float GameEngine::montecarlo(array<int,2> move, char color){
+  // creer un board initiliasé avec le board actuel + le move
+  int countWin=0;
+  default_random_engine generator;
+
+  // jouer successivement des pions W et B sur le board virtuel
+      for(int i=0; i<MAX_IT; i++){
+        cout<<i<<endl;
+        Board virtualBoard;
+        virtualBoard.move(color, get<0>(move), get<1>(move)); // execute le move proposé
+        int countPion[2];
+        virtualBoard.countPions(countPion);
+        int pionsCount = countPion[0] + countPion[1];
+        //cout<< pionsCount <<endl;
+
+        char tmpTurnOfPlayer = color== 'W' ? 'B' : 'W'; // initialise au tour du prochain
+        for(int j = 0; j < (SIZE_COL*SIZE_ROW) - pionsCount; j++){
+          auto tmpLegalMoves = virtualBoard.whatLegalMoves(tmpTurnOfPlayer);
+          //print(tmpLegalMoves);
+          // choisir un point random
+          uniform_int_distribution<int> distribution(0,tmpLegalMoves.size());
+          int numVec = distribution(generator);
+          array<int,2> choicedVec = tmpLegalMoves.at(numVec);
+
+          virtualBoard.move(tmpTurnOfPlayer, get<0>(choicedVec), get<1>(choicedVec));
+
+          tmpTurnOfPlayer = tmpTurnOfPlayer=='W' ? 'B' : 'W';
+        }
+
+        int winnerTab[2];
+        virtualBoard.countPions(winnerTab);
+        if(color == 'W' && winnerTab[0]<winnerTab[1]){
+          countWin++;
+        }
+      }
+      cout << "Countwin : "<< countWin<<endl;
+  return (countWin/MAX_IT);
 }
