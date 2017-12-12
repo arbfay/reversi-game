@@ -9,11 +9,16 @@
 #include <chrono>
 #include <thread>
 #include "constantes.h"
+#include <time.h>
+
 using namespace std;
 
 typedef char tab2d[SIZE_COL];
 class GameEngine;
 void print(vector<array<int,2>> vec);
+
+void print(vector<array<int,2>> vec);
+
 
 class Board{
   tab2d board[SIZE_ROW];
