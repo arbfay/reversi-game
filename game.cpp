@@ -79,7 +79,10 @@ void GameEngine::launch(){
     //print(flm);
     float mc = montecarlo(flm.at(0), 'B');
     //cout << mc << endl;
-    this_thread::sleep_for(chrono::milliseconds(1000));
+    //this_thread::sleep_for(chrono::milliseconds(1000));
+    if(mc){
+      cout<<"MC : "<<mc <<endl;
+    }
 
     m = askMove();
     int c[2] ;
@@ -90,7 +93,7 @@ void GameEngine::launch(){
       char cell = board.getCell(nc,nr);
       if( cell != 'W' && cell != 'B'){
           auto tmp = board.wut2flip(turnOfPlayer,nc,nr);
-          print(tmp);
+          //print(tmp);
           //cout<<tmp.size()<<endl;
           if(tmp.size() > 0){
             board.flipAll(tmp);
@@ -148,38 +151,63 @@ vector<array<int,2>> GameEngine::filterMoves(vector<array<int,2>> legalMoves){
 float GameEngine::montecarlo(array<int,2> move, char color){
   // creer un board initiliasé avec le board actuel + le move
   int countWin=0;
-  default_random_engine generator;
+  //default_random_engine generator;
+  srand(time(NULL));
 
   // jouer successivement des pions W et B sur le board virtuel
-      for(int i=0; i<MAX_IT; i++){
-        cout<<i<<endl;
-        Board virtualBoard;
-        virtualBoard.move(color, get<0>(move), get<1>(move)); // execute le move proposé
-        int countPion[2];
-        virtualBoard.countPions(countPion);
-        int pionsCount = countPion[0] + countPion[1];
-        //cout<< pionsCount <<endl;
 
-        char tmpTurnOfPlayer = color== 'W' ? 'B' : 'W'; // initialise au tour du prochain
-        for(int j = 0; j < (SIZE_COL*SIZE_ROW) - pionsCount; j++){
-          auto tmpLegalMoves = virtualBoard.whatLegalMoves(tmpTurnOfPlayer);
-          //print(tmpLegalMoves);
-          // choisir un point random
-          uniform_int_distribution<int> distribution(0,tmpLegalMoves.size());
-          int numVec = distribution(generator);
-          array<int,2> choicedVec = tmpLegalMoves.at(numVec);
 
-          virtualBoard.move(tmpTurnOfPlayer, get<0>(choicedVec), get<1>(choicedVec));
+  for(int i=0; i<MAX_IT; i++){
+    //cout<< pionsCount <<endl;
+    Board virtualBoard;
+    //virtualBoard.display();
+    virtualBoard.flipAll(virtualBoard.wut2flip(color,get<0>(move), get<1>(move)),1,color);
+    virtualBoard.move(color, get<0>(move), get<1>(move)); // execute le move proposé
 
+    int countPion[2];
+    virtualBoard.countPions(countPion);
+    int pionsCount = countPion[0] + countPion[1];
+
+    char tmpTurnOfPlayer = color== 'W' ? 'B' : 'W'; // initialise au tour du prochain
+    for(int j = 0; j < (SIZE_COL*SIZE_ROW) - pionsCount; j++){
+      //cout<<j<<endl;
+      //virtualBoard.display();
+      auto tmpLegalMoves = virtualBoard.whatLegalMoves(tmpTurnOfPlayer);
+      //print(tmpLegalMoves);
+      // choisir un point random
+      //uniform_int_distribution<int> distribution(0,tmpLegalMoves.size());
+      int tmpSize = tmpLegalMoves.size();
+      //cout<<tmpSize<<endl;
+      if(tmpSize == 0){
+        int tmpCountPion[2];
+        virtualBoard.countPions(tmpCountPion);
+        if(tmpCountPion[0] == 0 || tmpCountPion[1] == 0){
+          j = j + (SIZE_COL*SIZE_ROW) - pionsCount + 1;
+        } else {
+          j--;
           tmpTurnOfPlayer = tmpTurnOfPlayer=='W' ? 'B' : 'W';
         }
+      } else {
+        //cout<<numVec<<endl;
+        int numVec = rand() % tmpSize;
+        array<int,2> choicedVec = tmpLegalMoves.at(numVec);
 
-        int winnerTab[2];
-        virtualBoard.countPions(winnerTab);
-        if(color == 'W' && winnerTab[0]<winnerTab[1]){
-          countWin++;
-        }
+        auto tmpW2f = virtualBoard.wut2flip(tmpTurnOfPlayer,get<0>(choicedVec),get<1>(choicedVec));
+        //print(tmpW2f);
+        virtualBoard.flipAll(tmpW2f,1,tmpTurnOfPlayer);
+        virtualBoard.move(tmpTurnOfPlayer, get<0>(choicedVec), get<1>(choicedVec));
+
+        tmpTurnOfPlayer = tmpTurnOfPlayer=='W' ? 'B' : 'W';
       }
-      cout << "Countwin : "<< countWin<<endl;
-  return (countWin/MAX_IT);
+        //this_thread::sleep_for(chrono::milliseconds(100));
+    }
+
+    int winnerTab[2];
+    virtualBoard.countPions(winnerTab);
+    if(color == 'B' && winnerTab[0] < winnerTab[1]){
+      countWin++;
+    }
+  }
+  cout << "Countwin : "<< countWin<<endl;
+  return (float)(countWin/MAX_IT);
 }

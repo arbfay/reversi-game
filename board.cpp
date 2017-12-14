@@ -120,7 +120,7 @@ vector<array<int,2>> Board::wut2flip(char color, int nc, int nr){
   vector<array<int,2>> tmpToFlip;
   int trigger = 0;
   char turnOfPlayer = color;
-  if(board[nr][nc] == '.'){
+  if(board[nr][nc] == '.' && nc >= 0 && nr >= 0 ){
     for(int i=0; i<8; i++){
       vector<tuple<char,int,int>> dirVectors=getPions(nc,nr,directions[i]); //reçoit le vecteur des pions dans toutes les directions
 
@@ -254,7 +254,7 @@ vector<array<int,2>> Board::whatLegalMoves(char color){//quels sont les moves le
       //Calculer les gains potentiels pour chacune de ces cases
       //Si gain dans au moins une direction, on garde la case
       if(c != color && c != '.'){
-          cout<< "Char c : "<< c << ", color : "<< color <<endl;
+          //cout<< "Char c : "<< c << ", color : "<< color <<endl;
           vector<array<int,2>> east = wut2flip(color,i+1,j); // verifier que [i+1,j] est '.'
           vector<array<int,2>> neast = wut2flip(color,i+1,j-1);
           vector<array<int,2>> north = wut2flip(color,i,j-1);
