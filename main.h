@@ -1,6 +1,7 @@
 #include <iostream>
 #include <array>
 #include <string>
+#include <cstring>
 #include <vector>
 #include <set>
 #include <utility>
@@ -13,6 +14,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <algorithm>
+#include <future>
 //#include <random>
 
 using namespace std;
@@ -31,10 +33,11 @@ class Board{
   public:
     void display(ostream & out = cout) const;
     Board();
-    Board(tab2d* init);
+    void initialize(tab2d* init);
     tab2d* boardCopy();
     void setGameEngine(GameEngine* ptr);
     void convert_coord(int coord[],string m) ;// prend int et un char et on renvoi un tqbaleau de int
+    string convert_coord_inv(int nc, int nr);
     void move(char color, int nc,int nr);
     char getCell(int nc, int nr) const;
     void countPions(int tab[]);
@@ -69,10 +72,12 @@ class GameEngine{
   void updateTurnOfPlayer();
   public:
     GameEngine(char choice);
-    void move(int nc, int nr);
+    void move(int nc, int nr, char color);
     string askMove(); //la déplacer dans Player
     void setGameEngine(GameEngine* ptr);
     void launch();
+    void launchWithSkynet();
+    void launchWithFile();
     char getTurnOfPlayer();
     string askSkynetMove();
     vector<array<int,2>> filterMoves(vector<array<int,2>> legalMoves);

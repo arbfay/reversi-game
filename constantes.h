@@ -2,6 +2,6 @@
 
 #define SIZE_COL 8
 #define SIZE_ROW 8
-#define MAX_IT 100 //max iteration for montecarlo
+#define MAX_IT 250 //max iteration for montecarlo
 
 extern int boardWeights[8][8];

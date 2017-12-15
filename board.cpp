@@ -33,10 +33,10 @@ Board::Board(){
   game = ptrGame;
 }*/
 
-Board::Board(tab2d* init){
-  for(int i=0; i<SIZE_COL;i++){
-    for(int j=0; i<SIZE_ROW; j++){
-      board[i][j] = init[i][j];
+void Board::initialize(tab2d* init){
+  for(int i=0;i<SIZE_COL;i++){
+    for(int j=0;j<SIZE_ROW;j++){
+      board[i][j]=init[i][j];
     }
   }
 }
@@ -71,6 +71,17 @@ void Board::convert_coord(int coord[],string m){
   coord[0] = get<1>(*tabL2N.find((char) m[0]));
   coord[1] = m[1] - '0' ;
   coord[1]--;
+}
+
+string Board::convert_coord_inv(int nc, int nr){
+  char res[2];
+  char tabCol[SIZE_COL] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
+  res[0] = tabCol[nc];
+
+  nr++;
+  res[1] = nr + '0';
+
+  return res;
 }
 
 /*
@@ -120,7 +131,7 @@ vector<array<int,2>> Board::wut2flip(char color, int nc, int nr){
   vector<array<int,2>> tmpToFlip;
   int trigger = 0;
   char turnOfPlayer = color;
-  if(board[nr][nc] == '.' && nc >= 0 && nr >= 0 ){
+  if((board[nr][nc] != 'W' && board[nr][nc] != 'B') && nc >= 0 && nr >= 0 ){
     for(int i=0; i<8; i++){
       vector<tuple<char,int,int>> dirVectors=getPions(nc,nr,directions[i]); //reçoit le vecteur des pions dans toutes les directions
 
@@ -225,17 +236,10 @@ const vector<tuple<char,int,int>> Board::getPions(int nc, int nr, int direction)
 }
 
 void Board::flipAll(vector<array<int,2>> coord2flip, int virtuality, char color){ //
-  if(virtuality){
     for(int i = 0; i<coord2flip.size();i++){
       array<int,2> tmp = coord2flip.at(i);
       move(color,tmp[0],tmp[1]);
     }
-  } else{
-    for(int i = 0; i<coord2flip.size();i++){
-      array<int,2> tmp = coord2flip.at(i);
-      game->move(tmp[0],tmp[1]);
-    }
-  }
 }
 
 void Board::setGameEngine(GameEngine* ptr){
@@ -253,7 +257,7 @@ vector<array<int,2>> Board::whatLegalMoves(char color){//quels sont les moves le
 
       //Calculer les gains potentiels pour chacune de ces cases
       //Si gain dans au moins une direction, on garde la case
-      if(c != color && c != '.'){
+      if(c != color && (c == 'W' || c=='B')){
           //cout<< "Char c : "<< c << ", color : "<< color <<endl;
           vector<array<int,2>> east = wut2flip(color,i+1,j); // verifier que [i+1,j] est '.'
           vector<array<int,2>> neast = wut2flip(color,i+1,j-1);

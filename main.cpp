@@ -18,7 +18,14 @@ int main(){
 	GameEngine game(choice);
 
 	game.setGameEngine(&game);
-	game.launch();
+
+  if(choice == 'H'){
+    game.launch();
+  } else if (choice == 'A'){
+    game.launchWithSkynet();
+  } else if (choice == 'F'){
+    game.launchWithFile();
+  }
 
 	return 0;
 }
