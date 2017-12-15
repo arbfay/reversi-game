@@ -112,30 +112,36 @@ void GameEngine::launchWithSkynet(){
   int c[2] ;
 
   do{
-    m = askMove();
-    if(m.size() < 3){
-      /*executer le move*/
-      board.convert_coord(c,m);
-      int nc = c[0]; int nr = c[1];
-      char cell = board.getCell(nc,nr);
-      if( cell != 'W' && cell != 'B'){
-          auto tmp = board.wut2flip(player1.getColor(),nc,nr);
-          if(tmp.size() > 0){
-            board.flipAll(tmp,0, player1.getColor());
-            board.move(player1.getColor(),nc,nr); //ajoute le pion du joueur
-            //updateTurnOfPlayer(); //joueur suivant
-            nombreCoup++;
-          }
+    int trigH = 0;
+    do{
+      m = askMove();
+      if(m.size() < 3){
+        /*executer le move*/
+        board.convert_coord(c,m);
+        int nc = c[0]; int nr = c[1];
+        char cell = board.getCell(nc,nr);
+        if( cell != 'W' && cell != 'B'){
+            auto tmp = board.wut2flip(player1.getColor(),nc,nr);
+            if(tmp.size() > 0){
+              board.flipAll(tmp,0, player1.getColor());
+              board.move(player1.getColor(),nc,nr); //ajoute le pion du joueur
+              //updateTurnOfPlayer(); //joueur suivant
+              nombreCoup++;
+              trigH = 1;
+            }
+        }
+      } else if (m == "next"){
+        trigH=1;
       }
-    }
+    }while(!trigH);
 
     board.display();
-    cout<<"Skynet choisit son prochain mouvement..."<<endl;
+    cout<<"Skynet choisit son prochain mouvement...";
     string m2 = askSkynetMove();
     //system("clear");
-    board.display();
+    //board.display();
 
-    cout<<"Skynet a choisi : "<<m2<<endl;
+    cout<<"\rSkynet a choisi : "<<m2<<endl;
     if(m.size() < 3){ //si askMove renvoit 'next' ou autre -> ne joue pas
       board.convert_coord(c, m2);
       int nc = c[0]; int nr = c[1];

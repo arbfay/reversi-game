@@ -10,21 +10,23 @@ string GameEngine::askSkynetMove(){
   auto flm = filterMoves(legalMoves);
 
   //faire montecarlo pour les moves filtrés
-  future<float> amc1 = async(montecarlo, flm.at(0), player2.getColor());
-  future<float> amc2 = async(montecarlo, flm.at(1), player2.getColor());
-  future<float> amc3 = async(montecarlo, flm.at(2), player2.getColor());
-  //print(flm);
+  //future<float> amc1 = async(montecarlo, this, flm.at(0), player2.getColor());
+  //future<float> amc2 = async(montecarlo, this, flm.at(1), player2.getColor());
+  //future<float> amc3 = async(montecarlo, this, flm.at(2), player2.getColor());
+  print(flm);
 
-  /*cout<<"Starting MC"<<endl;
+  //cout<<"Starting MC"<<endl;
   float mc1 = montecarlo(flm.at(0), player2.getColor());
-  cout<<"MC1 done"<<endl;
+  //cout<<"MC1 done"<<endl;
   float mc2 = montecarlo(flm.at(1), player2.getColor());
-  cout<<"MC2 done"<<endl;
+  //cout<<"MC2 done"<<endl;
   float mc3 = montecarlo(flm.at(2), player2.getColor());
-  cout<<"MC3 done"<<endl;*/
-  float mc1 = amc1.get();
+  //scout<<"MC3 done"<<endl;
+
+  /*float mc1 = amc1.get();
   float mc2 = amc2.get();
   float mc3 = amc3.get();
+  cout<<"Async out"<<endl;*/
 
   //choisir la coord avec la plus grande valeur
   array<int,2> choicedCoord;
