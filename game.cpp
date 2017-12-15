@@ -114,7 +114,7 @@ void GameEngine::launchWithSkynet(){
   do{
     int trigH = 0;
     do{
-      m = askMove();
+      m = askSkynetMove(player1.getColor());
       if(m.size() < 3){
         /*executer le move*/
         board.convert_coord(c,m);
@@ -136,12 +136,12 @@ void GameEngine::launchWithSkynet(){
     }while(!trigH);
 
     board.display();
-    cout<<"Skynet choisit son prochain mouvement...";
-    string m2 = askSkynetMove();
+    cout<<"Skynet choisit son prochain mouvement..."<<endl;
+    string m2 = askSkynetMove(player2.getColor());
     //system("clear");
     //board.display();
 
-    cout<<"\rSkynet a choisi : "<<m2<<endl;
+    cout<<"Skynet a choisi : "<<m2<<endl;
     if(m.size() < 3){ //si askMove renvoit 'next' ou autre -> ne joue pas
       board.convert_coord(c, m2);
       int nc = c[0]; int nr = c[1];
@@ -154,12 +154,28 @@ void GameEngine::launchWithSkynet(){
             nombreCoup++;
           }
       }
+    } else {
+      auto tmpLegalMovesForW = board.whatLegalMoves('W');
+      auto tmpLegalMovesForB = board.whatLegalMoves('B');
+      if(tmpLegalMovesForB.size() == 0 && tmpLegalMovesForW.size() == 0){
+        nombreCoup=64;
+      }
     }
 
     //system("clear");
     board.display();
   } while(nombreCoup != 64 && m !="exit");
 
+  int counter[2];
+  board.countPions(counter);
+
+  if(counter[0] < counter[1]){
+    cout<<"Skynet a remporté la partie avec "<<counter[1]<<" pions."<<endl;
+  }
+  else if (counter[0] > counter[1]){
+    cout<<"Le joueur B a remporté la partie avec "<<counter[0]<<" pions."<<endl;
+  }
+  else{cout<<"Match nul !"<<endl;}
 }
 
 char GameEngine::getTurnOfPlayer(){

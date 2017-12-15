@@ -1,8 +1,8 @@
 #include "main.h"
 using namespace std;
 
-string GameEngine::askSkynetMove(){
-  auto legalMoves = board.whatLegalMoves(player2.getColor());
+string GameEngine::askSkynetMove(char color){
+  auto legalMoves = board.whatLegalMoves(color);
   if(legalMoves.size() == 0){
     return "next";
   }
@@ -13,15 +13,15 @@ string GameEngine::askSkynetMove(){
   //future<float> amc1 = async(montecarlo, this, flm.at(0), player2.getColor());
   //future<float> amc2 = async(montecarlo, this, flm.at(1), player2.getColor());
   //future<float> amc3 = async(montecarlo, this, flm.at(2), player2.getColor());
-  print(flm);
+  //print(flm);
 
   //cout<<"Starting MC"<<endl;
-  float mc1 = montecarlo(flm.at(0), player2.getColor());
+  float mc1 = flm.size() > 0 ? montecarlo(flm.at(0), color) : 0.0;
   //cout<<"MC1 done"<<endl;
-  float mc2 = montecarlo(flm.at(1), player2.getColor());
+  float mc2 = flm.size() > 1 ? montecarlo(flm.at(1), color) : 0.0;
   //cout<<"MC2 done"<<endl;
-  float mc3 = montecarlo(flm.at(2), player2.getColor());
-  //scout<<"MC3 done"<<endl;
+  float mc3 = flm.size() > 2 ? montecarlo(flm.at(2), color) : 0.0;
+  //cout<<"MC3 done"<<endl;
 
   /*float mc1 = amc1.get();
   float mc2 = amc2.get();
@@ -30,12 +30,14 @@ string GameEngine::askSkynetMove(){
 
   //choisir la coord avec la plus grande valeur
   array<int,2> choicedCoord;
-  if(mc1 >= mc2 && mc1 >= mc3){
+  if(mc1 >= mc2 && mc1 >= mc3 && flm.size()>0){
     choicedCoord = flm.at(0);
-  } else if (mc2 > mc1 && mc2 > mc3){
+  } else if (mc2 > mc1 && mc2 > mc3 && flm.size()>1){
     choicedCoord = flm.at(1);
-  } else {
+  } else if (flm.size()>2){
     choicedCoord = flm.at(2);
+  } else {
+    return "next";
   }
 
   //convertir cette coord en lettre-chiffre
@@ -54,6 +56,7 @@ float GameEngine::montecarlo(array<int,2> move, char color){
     tab2d* bc = board.boardCopy();
     Board virtualBoard;
     virtualBoard.initialize(bc);
+
     virtualBoard.flipAll(virtualBoard.wut2flip(color,get<0>(move), get<1>(move)),1,color);
     virtualBoard.move(color, get<0>(move), get<1>(move)); // execute le move proposé
 
@@ -64,18 +67,26 @@ float GameEngine::montecarlo(array<int,2> move, char color){
     char tmpTurnOfPlayer = color== 'W' ? 'B' : 'W'; // initialise au tour du prochain
     for(int j = 0; j < (SIZE_COL*SIZE_ROW) - pionsCount; j++){
       auto tmpLegalMoves = virtualBoard.whatLegalMoves(tmpTurnOfPlayer);
-
+      //print(tmpLegalMoves);
       int tmpSize = tmpLegalMoves.size();
       //cout<<tmpSize<<endl;
       if(tmpSize == 0){
         int tmpCountPion[2];
         virtualBoard.countPions(tmpCountPion);
+        //virtualBoard.display();
         if(tmpCountPion[0] == 0 || tmpCountPion[1] == 0){
           j = j + (SIZE_COL*SIZE_ROW) - pionsCount + 1;
         } else {
-          j--;
-          tmpTurnOfPlayer = tmpTurnOfPlayer=='W' ? 'B' : 'W';
+          auto tmpLegalMovesForW = virtualBoard.whatLegalMoves('W');
+          auto tmpLegalMovesForB = virtualBoard.whatLegalMoves('B');
+          if(tmpLegalMovesForB.size() == 0 && tmpLegalMovesForW.size() == 0){ //Si ni l'un ni l'autre ne sait jouer, arrêter le jeu virtuel
+            break;
+          } else {
+            j--;
+            tmpTurnOfPlayer = tmpTurnOfPlayer=='W' ? 'B' : 'W';
+          }
         }
+
       } else {
         int numVec = rand() % tmpSize;
         array<int,2> choicedVec = tmpLegalMoves.at(numVec);
@@ -107,7 +118,8 @@ vector<array<int,2>> GameEngine::filterMoves(vector<array<int,2>> legalMoves){
     sort(legalMoves.begin(), legalMoves.end(), compareCoord);
 
     // nous gardons uniquement les 3 premiers elements de legalMoves triés
-    legalMoves.erase(legalMoves.begin()+3, legalMoves.end());
+    int tmp = legalMoves.size()>=3 ? 3 : legalMoves.size();
+    legalMoves.erase(legalMoves.begin()+tmp, legalMoves.end());
 
     return legalMoves;
 }

@@ -131,8 +131,8 @@ vector<array<int,2>> Board::wut2flip(char color, int nc, int nr){
   vector<array<int,2>> tmpToFlip;
   int trigger = 0;
   char turnOfPlayer = color;
-  if((board[nr][nc] != 'W' && board[nr][nc] != 'B') && nc >= 0 && nr >= 0 ){
-    for(int i=0; i<8; i++){
+  if((board[nr][nc] != 'W' && board[nr][nc] != 'B') && nc >= 0 && nr >= 0 && nc < SIZE_COL && nr < SIZE_ROW ){
+    for(int i=0; i<SIZE_COL; i++){
       vector<tuple<char,int,int>> dirVectors=getPions(nc,nr,directions[i]); //reçoit le vecteur des pions dans toutes les directions
 
       for(int j=0; j < dirVectors.size() ; j++){
@@ -142,8 +142,7 @@ vector<array<int,2>> Board::wut2flip(char color, int nc, int nr){
         char tmpChar = get<0>(tup);
         int tmpCoordC = get<1>(tup);
         int tmpCoordR = get<2>(tup);
-        //cout<<"tuple : ("<<tmpChar<<", "<< tmpCoordC << ", "<< tmpCoordR <<")"<<endl;
-
+        //cout<<tmpChar<<","<<tmpCoordC<<","<<tmpCoordR<<endl;
         if(tmpChar != turnOfPlayer ){ //tant qu'on arrive pas à char égal à celui du joueur, c'est que le pion est à tourner
             array<int,2> tmp = {tmpCoordC, tmpCoordR};
             tmpToFlip.push_back(tmp);
@@ -158,7 +157,6 @@ vector<array<int,2>> Board::wut2flip(char color, int nc, int nr){
         tmpToFlip.clear();
       } else {
         //insert tmpToFlip in toFlip
-        //cout<<"wut2flip (tmp) size : "<< tmpToFlip.size()<<endl;
         toFlip.insert(toFlip.end(), tmpToFlip.begin(), tmpToFlip.end());
         tmpToFlip.clear();
       }
@@ -170,7 +168,7 @@ vector<array<int,2>> Board::wut2flip(char color, int nc, int nr){
 
 const vector<tuple<char,int,int>> Board::getPions(int nc, int nr, int direction){
   //1- Récupérer la ligne nr du board
-  tab2d* cBoard = boardCopy();
+  //tab2d* cBoard = boardCopy();
 
   //2- Itérer sur ]nc, SIZE_ROW] en s'arrêtent à '.' et enregistrer la série de lettre dans un vector
   vector<tuple<char,int,int>> results;
@@ -181,48 +179,48 @@ const vector<tuple<char,int,int>> Board::getPions(int nc, int nr, int direction)
   for(int i = 1; i<SIZE_ROW;i++){
     switch(direction){
       case 1:
-        elem=cBoard[nr][nc+i];
+        elem=board[nr][nc+i];
         coord[0]=nc+i;
         coord[1]=nr;
         break;
       case 2:
-        elem=cBoard[nr-i][nc+i];
+        elem=board[nr-i][nc+i];
         coord[0]=nc+i;
         coord[1]=nr-i;
         break;
       case 3:
-        elem=cBoard[nr-i][nc];
+        elem=board[nr-i][nc];
         coord[0]=nc;
         coord[1]=nr-i;
         break;
       case 4:
-        elem=cBoard[nr-i][nc-i];
+        elem=board[nr-i][nc-i];
         coord[0]=nc-i;
         coord[1]=nr-i;
         break;
       case 5:
-        elem=cBoard[nr][nc-i];
+        elem=board[nr][nc-i];
         coord[0]=nc-i;
         coord[1]=nr;
         break;
       case 6:
-        elem=cBoard[nr+i][nc-i];
+        elem=board[nr+i][nc-i];
         coord[0]=nc-i;
         coord[1]=nr+i;
         break;
       case 7:
-        elem=cBoard[nr+i][nc];
+        elem=board[nr+i][nc];
         coord[0]=nc;
         coord[1]=nr+i;
         break;
       case 8:
-        elem=cBoard[nr+i][nc+i];
+        elem=board[nr+i][nc+i];
         coord[0]=nc+i;
         coord[1]=nr+i;
         break;
     }
 
-    if(elem != '.' && (elem == 'W' || elem == 'B') && (coord[0]>=0 && coord[1]>=0) && (coord[0]<SIZE_COL && coord[1]<SIZE_ROW)){
+    if((elem == 'W' || elem == 'B') && (coord[0]>=0 && coord[1]>=0) && (coord[0]<SIZE_COL && coord[1]<SIZE_ROW)){
       //cout<<elem<<" ("<<coord[0]<<", "<<coord[1]<<")"<<endl;
       auto tmp = make_tuple(elem, coord[0], coord[1]);
       //results.insert(results.begin(), tmp);
@@ -257,8 +255,9 @@ vector<array<int,2>> Board::whatLegalMoves(char color){//quels sont les moves le
 
       //Calculer les gains potentiels pour chacune de ces cases
       //Si gain dans au moins une direction, on garde la case
-      if(c != color && (c == 'W' || c=='B')){
-          //cout<< "Char c : "<< c << ", color : "<< color <<endl;
+      char colorTest = color=='W' ? 'B' : 'W';
+      if(c == colorTest){
+          //cout<< "Char c : "<< c << ", colorTest : "<< colorTest <<endl;
           vector<array<int,2>> east = wut2flip(color,i+1,j); // verifier que [i+1,j] est '.'
           vector<array<int,2>> neast = wut2flip(color,i+1,j-1);
           vector<array<int,2>> north = wut2flip(color,i,j-1);
@@ -312,7 +311,6 @@ vector<array<int,2>> Board::whatLegalMoves(char color){//quels sont les moves le
     }
   }
   //Retourner les cases avec gain
-  //print(results);
   vector<array<int,2>> toReturn(results.begin(), results.end());
   return toReturn;
 };

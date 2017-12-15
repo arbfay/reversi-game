@@ -79,7 +79,7 @@ class GameEngine{
     void launchWithSkynet();
     void launchWithFile();
     char getTurnOfPlayer();
-    string askSkynetMove();
+    string askSkynetMove(char color);
     vector<array<int,2>> filterMoves(vector<array<int,2>> legalMoves);
     float montecarlo(array<int,2> move, char color);
     //vector<array<int,2>> wut2flip(int nc,int nr); //la déplacer dans Board
