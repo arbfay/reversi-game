@@ -30,12 +30,7 @@ void GameEngine::updateTurnOfPlayer(){
 }
 
 void GameEngine::move(int nc, int nr, char color){
-  //Recupérer la ligne (array)
-  if(/*row[nc] != '.'*/0 ){
-    // Move is invalid
-  } else {
-      board.move(color,nc,nr);
-  }
+  board.move(color,nc,nr);
 }
 
 string GameEngine::askMove(){
@@ -77,9 +72,10 @@ void GameEngine::launch(){
       char cell = board.getCell(nc,nr);
       if( cell != 'W' && cell != 'B'){
           auto tmp = board.wut2flip(turnOfPlayer,nc,nr);
+
           if(tmp.size() > 0){
-            board.flipAll(tmp);
-            move(turnOfPlayer,nc,nr); //ajoute le pion du joueur
+            board.flipAll(tmp,0,turnOfPlayer);
+            move(nc,nr,turnOfPlayer); //ajoute le pion du joueur
             updateTurnOfPlayer(); //joueur suivant
             nombreCoup++;
           }
@@ -189,3 +185,8 @@ void GameEngine::setGameEngine(GameEngine* ptr){
 void GameEngine::launchWithFile(){
 
 };
+
+
+void GameEngine::generateWeights(){
+  
+}

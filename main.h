@@ -78,6 +78,7 @@ class GameEngine{
     void launch();
     void launchWithSkynet();
     void launchWithFile();
+    void generateWeights();
     char getTurnOfPlayer();
     string askSkynetMove(char color);
     vector<array<int,2>> filterMoves(vector<array<int,2>> legalMoves);

@@ -67,9 +67,9 @@ float GameEngine::montecarlo(array<int,2> move, char color){
     char tmpTurnOfPlayer = color== 'W' ? 'B' : 'W'; // initialise au tour du prochain
     for(int j = 0; j < (SIZE_COL*SIZE_ROW) - pionsCount; j++){
       auto tmpLegalMoves = virtualBoard.whatLegalMoves(tmpTurnOfPlayer);
-      //print(tmpLegalMoves);
+
       int tmpSize = tmpLegalMoves.size();
-      //cout<<tmpSize<<endl;
+      
       if(tmpSize == 0){
         int tmpCountPion[2];
         virtualBoard.countPions(tmpCountPion);
@@ -79,6 +79,7 @@ float GameEngine::montecarlo(array<int,2> move, char color){
         } else {
           auto tmpLegalMovesForW = virtualBoard.whatLegalMoves('W');
           auto tmpLegalMovesForB = virtualBoard.whatLegalMoves('B');
+
           if(tmpLegalMovesForB.size() == 0 && tmpLegalMovesForW.size() == 0){ //Si ni l'un ni l'autre ne sait jouer, arrêter le jeu virtuel
             break;
           } else {
