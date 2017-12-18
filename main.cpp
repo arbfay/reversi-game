@@ -25,6 +25,8 @@ int main(){
     game.launchWithSkynet();
   } else if (choice == 'F'){
     game.launchWithFile();
+  } else if (choice == 'G'){
+    game.generateWeights();
   }
 
 	return 0;
@@ -37,7 +39,7 @@ char choice_menu(){
 		cout << "Choisissez un mode de jeu :\n"<< "H - Jouer contre un Hooman\n" << "A - Jouer contre Skynet\n" << "F - Jouer contre un script\n" <<endl;
 		cin >> choice;
 		choice=toupper(choice);
-	} while(choice != 'H' && choice != 'A' && choice != 'F');
+	} while(choice != 'H' && choice != 'A' && choice != 'F' && choice != 'G');
 	return choice;
 }
 

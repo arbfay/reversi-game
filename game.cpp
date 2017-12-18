@@ -188,5 +188,160 @@ void GameEngine::launchWithFile(){
 
 
 void GameEngine::generateWeights(){
-  
+  //create the table of weights put at 0
+
+  int N = 1000;
+  int M = 100;
+  float averagedWW[SIZE_ROW][SIZE_COL]; //final results will be here
+  float averagedWB[SIZE_ROW][SIZE_COL];
+  float listOfCalculatedWeightsW[M][SIZE_ROW][SIZE_COL]; //list of the weights calculated for each montecarlo
+  float listOfCalculatedWeightsB[M][SIZE_ROW][SIZE_COL];
+
+  for(int it = 0; it < M; it++){
+    float weightsForWhite[SIZE_ROW][SIZE_COL];
+    float weightsForBlack[SIZE_ROW][SIZE_COL];
+    for(int i = 0; i<SIZE_ROW; i++){
+      for(int j = 0; j<SIZE_COL; j++){
+        weightsForWhite[i][j]=0.0;
+        weightsForBlack[i][j]=0.0;
+      }
+    }
+    //make the modified montecarlo
+    for(int i=0; i<N; i++){
+      srand(time(NULL));
+
+      vector<array<int,2>> pathW;
+      vector<array<int,2>> pathB;
+
+      tab2d* bc = board.boardCopy();
+      Board virtualBoard;
+      virtualBoard.initialize(bc);
+
+      char color = 'B';
+      auto firstLegalMoves = virtualBoard.whatLegalMoves(color);
+      auto move = firstLegalMoves.at(rand() % firstLegalMoves.size()); // choix aléatoire du premier move
+
+      virtualBoard.flipAll(virtualBoard.wut2flip(color,get<0>(move), get<1>(move)),1,color);
+      virtualBoard.move(color, get<0>(move), get<1>(move)); // execute le move proposé
+
+      int countPion[2];
+      virtualBoard.countPions(countPion);
+      int pionsCount = countPion[0] + countPion[1];
+
+      char tmpTurnOfPlayer = color== 'W' ? 'B' : 'W'; // initialise au tour du prochain
+      for(int j = 0; j < (SIZE_COL*SIZE_ROW) - pionsCount; j++){
+        auto tmpLegalMoves = virtualBoard.whatLegalMoves(tmpTurnOfPlayer);
+
+        int tmpSize = tmpLegalMoves.size();
+
+        if(tmpSize == 0){
+          int tmpCountPion[2];
+          virtualBoard.countPions(tmpCountPion);
+          //virtualBoard.display();
+          if(tmpCountPion[0] == 0 || tmpCountPion[1] == 0){
+            j = j + (SIZE_COL*SIZE_ROW) - pionsCount + 1;
+          } else {
+            auto tmpLegalMovesForW = virtualBoard.whatLegalMoves('W');
+            auto tmpLegalMovesForB = virtualBoard.whatLegalMoves('B');
+
+            if(tmpLegalMovesForB.size() == 0 && tmpLegalMovesForW.size() == 0){ //Si ni l'un ni l'autre ne sait jouer, arrêter le jeu virtuel
+              break;
+            } else {
+              j--;
+              tmpTurnOfPlayer = tmpTurnOfPlayer=='W' ? 'B' : 'W';
+            }
+          }
+
+        } else {
+          int numVec = rand() % tmpSize;
+          array<int,2> choicedVec = tmpLegalMoves.at(numVec);
+
+          auto tmpW2f = virtualBoard.wut2flip(tmpTurnOfPlayer,get<0>(choicedVec),get<1>(choicedVec));
+
+          virtualBoard.flipAll(tmpW2f,1,tmpTurnOfPlayer);
+          virtualBoard.move(tmpTurnOfPlayer, get<0>(choicedVec), get<1>(choicedVec));
+
+          if(tmpTurnOfPlayer=='W'){ // ajoute au path le move choisi
+            pathW.push_back(choicedVec);
+          } else {
+            pathB.push_back(choicedVec);
+          }
+
+          tmpTurnOfPlayer = tmpTurnOfPlayer=='W' ? 'B' : 'W';
+        }
+          //this_thread::sleep_for(chrono::milliseconds(100));
+      }
+
+      int winnerTab[2];
+      virtualBoard.countPions(winnerTab);
+
+      if(winnerTab[0] < winnerTab[1]){// white is winner
+        for(int i =0; i<pathW.size(); i++){// adding the weights
+          array<int,2> coW = pathW.at(i);
+          weightsForWhite[get<0>(coW)][get<1>(coW)] += 1;
+        }
+      } else if(winnerTab[0] > winnerTab[1]){//black is winner
+        for(int i =0; i<pathB.size(); i++){//adding the weights
+          array<int,2> coB = pathB.at(i);
+          weightsForBlack[get<0>(coB)][get<1>(coB)] += 1;
+        }
+      }
+      pathW.clear();// clear for the next game;
+      pathB.clear();
+    }
+
+    //normalize the weights
+    for(int i = 0; i<SIZE_ROW; i++){
+      for(int j = 0; j<SIZE_COL; j++){
+        weightsForBlack[i][j] /= N;
+        weightsForWhite[i][j] /= N;
+        listOfCalculatedWeightsB[it][i][j] = weightsForBlack[i][j];
+        listOfCalculatedWeightsW[it][i][j] = weightsForWhite[i][j];
+      }
+    }
+  }
+
+  //initialise averagedWB/W
+  for(int i = 0; i<SIZE_ROW; i++){
+    for(int j = 0; j<SIZE_COL; j++){
+      averagedWB[i][j]=0.0;
+      averagedWW[i][j]=0.0;
+    }
+  }
+  //sum all the calculated weights per cell
+  for(int it = 0; it < M; it++){
+    for(int i = 0; i < SIZE_ROW; i++){
+      for(int j = 0; j < SIZE_COL; j++){
+        averagedWB[i][j] += listOfCalculatedWeightsB[it][i][j];
+        averagedWW[i][j] += listOfCalculatedWeightsW[it][i][j];
+      }
+    }
+  }
+
+  //divide the values of the cells by M to get the average
+  for(int i = 0; i < SIZE_ROW; i++){
+    for(int j = 0; j < SIZE_COL; j++){
+      averagedWB[i][j] /= M;
+      averagedWW[i][j] /= M;
+    }
+  }
+
+  //print the weights for black
+  cout<<"\n-----Average weights for player B-----"<<endl;
+  for(int i = 0; i<SIZE_ROW; i++){
+    for(int j = 0; j<SIZE_COL; j++){
+      cout<<" | "<<averagedWB[i][j];
+    }
+    cout<<" | "<<endl;
+  }
+
+  cout<<"\n\n-----Average weights for player W-----"<<endl;
+  for(int i = 0; i<SIZE_ROW; i++){
+    for(int j = 0; j<SIZE_COL; j++){
+      cout<<" | "<<averagedWW[i][j];
+    }
+    cout<<" | "<<endl;
+  }
+
+  //repeat & average the normalized weights
 }
