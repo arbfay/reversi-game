@@ -182,7 +182,95 @@ void GameEngine::setGameEngine(GameEngine* ptr){
   board.setGameEngine(ptr);
 }
 
-void GameEngine::launchWithFile(){
+void GameEngine::launchWithFile(string filepath){
+  ifstream theFile(filepath);
+  system("clear");
+  board.display();
+  string m="";
+  int nombreCoup=4;
+
+  string res;
+
+  do{
+      int trigH = 0;
+      int trigF = 0;
+      do{
+        m = askMove();
+        int c[2] ;
+        if(m.size() < 3){
+          /*executer le move*/
+          board.convert_coord(c,m);
+          int nc = c[0]; int nr = c[1];
+          char cell = board.getCell(nc,nr);
+          if( cell != 'W' && cell != 'B'){
+              auto tmp = board.wut2flip(player1.getColor(),nc,nr);
+              if(tmp.size() > 0){
+                board.flipAll(tmp,0,player1.getColor());
+                move(nc,nr,player1.getColor()); //ajoute le pion du joueur
+                //updateTurnOfPlayer(); //joueur suivant
+                nombreCoup++;
+                trigH = 1;
+              }
+          }
+          system("clear");
+          board.display();
+        }
+        else if(m=="next"){ // Commande pour passer son tour
+          trigH = 1;
+        }
+      }while(!trigH);
+
+      int is_read = 0;
+
+      do{
+        string buffer;
+        theFile.open(filepath);
+        do{ //read the move on the file
+          std::getline(theFile, buffer);
+          if(buffer.size() > 1){
+            is_read=1;
+          } else {
+            theFile.clear();
+            cout<<"En attente du joueur blanc (fichier)..."<<endl;
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+          }
+        }while(theFile.is_open() && !is_read);
+
+        int c[2];
+        if(buffer.size() > 1){
+          /*executer le move*/
+          board.convert_coord(c,buffer);
+          int nc = c[0]; int nr = c[1];
+          char cell = board.getCell(nc,nr);
+          if(cell != 'W' && cell != 'B'){
+              auto tmp = board.wut2flip(player2.getColor(),nc,nr);
+              if(tmp.size() > 0){
+                board.flipAll(tmp,0, player2.getColor());
+                move(nc,nr,player2.getColor()); //ajoute le pion du joueur
+                nombreCoup++;
+                trigF = 1;
+              }
+          }
+        } else if (buffer == "next"){
+          trigF=1;
+        }
+      }while(!trigF);
+
+      system("clear");
+      board.display();
+
+  } while(nombreCoup != 64 && m !="exit");
+
+  int counter[2];
+  board.countPions(counter);
+
+  if(counter[0] < counter[1]){
+    cout<<"le joueur W a remporté la partie avec "<<counter[1]<<" pions."<<endl;
+  }
+  else if (counter[0] > counter[1]){
+    cout<<"le joueur B a remporté la partie avec "<<counter[0]<<" pions."<<endl;
+  }
+  else{cout<<"Match nul !"<<endl;}
 
 };
 
@@ -190,8 +278,8 @@ void GameEngine::launchWithFile(){
 void GameEngine::generateWeights(){
   //create the table of weights put at 0
 
-  int N = 1000;
-  int M = 100;
+  int N = 100;
+  int M = 10;
   float averagedWW[SIZE_ROW][SIZE_COL]; //final results will be here
   float averagedWB[SIZE_ROW][SIZE_COL];
   float listOfCalculatedWeightsW[M][SIZE_ROW][SIZE_COL]; //list of the weights calculated for each montecarlo

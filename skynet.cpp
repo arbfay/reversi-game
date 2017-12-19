@@ -10,10 +10,14 @@ string GameEngine::askSkynetMove(char color){
   auto flm = filterMoves(legalMoves);
 
   //faire montecarlo pour les moves filtrés
-  //future<float> amc1 = async(montecarlo, this, flm.at(0), player2.getColor());
-  //future<float> amc2 = async(montecarlo, this, flm.at(1), player2.getColor());
-  //future<float> amc3 = async(montecarlo, this, flm.at(2), player2.getColor());
-  //print(flm);
+  /*future<float> amc1 = async(std::launch::async,montecarlo, this, flm.at(0), color);
+  future<float> amc2 = async(std::launch::async,montecarlo, this, flm.at(1), color);
+  future<float> amc3 = async(std::launch::async,montecarlo, this, flm.at(2), color);
+  */
+
+  //thread tmc1(montecarlo, this, flm.at(0), color);
+  //thread tmc2(montecarlo, this, flm.at(0), color);
+  //thread tmc3(montecarlo, this, flm.at(0), color);
 
   //cout<<"Starting MC"<<endl;
   float mc1 = flm.size() > 0 ? montecarlo(flm.at(0), color) : 0.0;
@@ -69,7 +73,7 @@ float GameEngine::montecarlo(array<int,2> move, char color){
       auto tmpLegalMoves = virtualBoard.whatLegalMoves(tmpTurnOfPlayer);
 
       int tmpSize = tmpLegalMoves.size();
-      
+
       if(tmpSize == 0){
         int tmpCountPion[2];
         virtualBoard.countPions(tmpCountPion);

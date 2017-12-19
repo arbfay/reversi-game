@@ -24,7 +24,9 @@ int main(){
   } else if (choice == 'A'){
     game.launchWithSkynet();
   } else if (choice == 'F'){
-    game.launchWithFile();
+    cout<<"Utiliez le fichier './file_player.txt' pour jouer"<<endl;
+    string path("./file_player.txt");
+    game.launchWithFile(path);
   } else if (choice == 'G'){
     game.generateWeights();
   }

@@ -15,6 +15,8 @@
 #include <stdio.h>
 #include <algorithm>
 #include <future>
+#include <thread>
+#include <fstream>
 //#include <random>
 
 using namespace std;
@@ -77,9 +79,10 @@ class GameEngine{
     void setGameEngine(GameEngine* ptr);
     void launch();
     void launchWithSkynet();
-    void launchWithFile();
+    void launchWithFile(string filepath);
     void generateWeights();
     char getTurnOfPlayer();
+    string askFileMove(ostream * file);
     string askSkynetMove(char color);
     vector<array<int,2>> filterMoves(vector<array<int,2>> legalMoves);
     float montecarlo(array<int,2> move, char color);
