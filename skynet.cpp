@@ -10,27 +10,22 @@ string GameEngine::askSkynetMove(char color){
   auto flm = filterMoves(legalMoves);
 
   //faire montecarlo pour les moves filtrés
-  /*future<float> amc1 = async(std::launch::async,montecarlo, this, flm.at(0), color);
+  future<float> amc1 = async(std::launch::async,montecarlo, this, flm.at(0), color);
   future<float> amc2 = async(std::launch::async,montecarlo, this, flm.at(1), color);
   future<float> amc3 = async(std::launch::async,montecarlo, this, flm.at(2), color);
-  */
-
-  //thread tmc1(montecarlo, this, flm.at(0), color);
-  //thread tmc2(montecarlo, this, flm.at(0), color);
-  //thread tmc3(montecarlo, this, flm.at(0), color);
 
   //cout<<"Starting MC"<<endl;
-  float mc1 = flm.size() > 0 ? montecarlo(flm.at(0), color) : 0.0;
+/*  float mc1 = flm.size() > 0 ? montecarlo(flm.at(0), color) : 0.0;
   //cout<<"MC1 done"<<endl;
   float mc2 = flm.size() > 1 ? montecarlo(flm.at(1), color) : 0.0;
   //cout<<"MC2 done"<<endl;
   float mc3 = flm.size() > 2 ? montecarlo(flm.at(2), color) : 0.0;
   //cout<<"MC3 done"<<endl;
-
-  /*float mc1 = amc1.get();
+*/
+  float mc1 = amc1.get();
   float mc2 = amc2.get();
   float mc3 = amc3.get();
-  cout<<"Async out"<<endl;*/
+  cout<<"Async out"<<endl;
 
   //choisir la coord avec la plus grande valeur
   array<int,2> choicedCoord;
