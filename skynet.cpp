@@ -10,9 +10,13 @@ string GameEngine::askSkynetMove(char color){
   auto flm = filterMoves(legalMoves);
 
   //faire montecarlo pour les moves filtrés
-  future<float> amc1 = async(std::launch::async,montecarlo, this, flm.at(0), color);
-  future<float> amc2 = async(std::launch::async,montecarlo, this, flm.at(1), color);
-  future<float> amc3 = async(std::launch::async,montecarlo, this, flm.at(2), color);
+  future<float> amc1 = async(std::launch::async,&GameEngine::montecarlo,this, flm.at(0), color); //existe dans tous les cas
+  future<float> amc2, amc3;
+  if(flm.size()>1)
+    amc2 = async(std::launch::async,&GameEngine::montecarlo,this, flm.at(1), color);
+
+  if(flm.size()>2)
+    amc3 = async(std::launch::async,&GameEngine::montecarlo,this, flm.at(2), color);
 
   //cout<<"Starting MC"<<endl;
 /*  float mc1 = flm.size() > 0 ? montecarlo(flm.at(0), color) : 0.0;
@@ -23,8 +27,8 @@ string GameEngine::askSkynetMove(char color){
   //cout<<"MC3 done"<<endl;
 */
   float mc1 = amc1.get();
-  float mc2 = amc2.get();
-  float mc3 = amc3.get();
+  float mc2 = flm.size()>1 ? amc2.get() : 0.0;
+  float mc3 = flm.size()>2 ? amc3.get() : 0.0;
   cout<<"Async out"<<endl;
 
   //choisir la coord avec la plus grande valeur
@@ -88,6 +92,7 @@ float GameEngine::montecarlo(array<int,2> move, char color){
         }
 
       } else {
+
         int numVec = rand() % tmpSize;
         array<int,2> choicedVec = tmpLegalMoves.at(numVec);
 
@@ -106,7 +111,7 @@ float GameEngine::montecarlo(array<int,2> move, char color){
     if((color == 'B' && winnerTab[0] > winnerTab[1]) || (color == 'W' && winnerTab[0] < winnerTab[1]))
       countWin++;
   }
-  return (float)(countWin/MAX_IT);
+  return ((float)countWin/(float)MAX_IT);
 }
 
 bool compareCoord (array<int,2> a, array<int,2> b){
