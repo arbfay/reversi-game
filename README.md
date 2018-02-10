@@ -1,5 +1,5 @@
 # Reversi game with AI player
-by Arbai Fayçal & Benabdesselam Nadir
+by Arbai Fayçal (ULB) & Benabdesselam Nadir (
 
 This project is a reversi game with 3 mode :
   - Human vs Human
@@ -18,3 +18,6 @@ This project is a reversi game with 3 mode :
  For Windows users, download the **reversi_win.exe** file.
  
  For other OS, you can use the makefile to create an executable.
+
+# Note
+Comments in the code are in French. We hope you're bilingual.
