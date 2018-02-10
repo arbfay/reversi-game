@@ -1,5 +1,5 @@
 # Reversi game with AI player
-by Arbai Fayçal (ULB) & Benabdesselam Nadir (
+by Arbai Fayçal & Benabdesselam Nadir
 
 This project is a reversi game with 3 mode :
   - Human vs Human
